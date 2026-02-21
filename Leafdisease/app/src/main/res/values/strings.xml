@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Leaf disease</string>
+
+    // Home screen
+    <string name="home_screen_header">Los cultivos sanos empiezan aquí</string>
+    <string name="home_screen_Description">Analiza las hojas de cultivos con modelos de inteligencia artificial </string>
+
+</resources>
