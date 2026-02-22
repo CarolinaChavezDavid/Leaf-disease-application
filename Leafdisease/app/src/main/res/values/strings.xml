@@ -3,6 +3,9 @@
 
     // Home screen
     <string name="home_screen_header">Los cultivos sanos empiezan aquí</string>
-    <string name="home_screen_Description">Analiza las hojas de cultivos con modelos de inteligencia artificial </string>
+    <string name="home_screen_description">Analiza las hojas de cultivos con modelos de inteligencia artificial </string>
+    <string name="home_screen_image_content">Diagnóstico por IA</string>
+    <string name="home_screen_take_photo_button">Tomar foto</string>
+    <string name="home_screen_upload_image_button">Subir desde la galería</string>
 
 </resources>
