@@ -5,8 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.leafdisease.R
 import com.example.leafdisease.ui.theme.LeafDiseaseTheme
 import com.example.leafdisease.view.components.CoreButton
+import com.example.leafdisease.view.components.CoreButtonType
 
 
 @Composable
@@ -49,26 +47,32 @@ fun HomeScreen() {
         Text(
             modifier = Modifier.padding(bottom = LeafDiseaseTheme.dimensions.dimension12),
             text = stringResource(R.string.home_screen_header),
-            style = LeafDiseaseTheme.typography.headlineLarge
+            style = LeafDiseaseTheme.customTypography.header,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = stringResource(R.string.home_screen_header),
-            style = LeafDiseaseTheme.typography.titleLarge
+            style = LeafDiseaseTheme.customTypography.subtitle,
+            textAlign = TextAlign.Center
         )
 
         HomeImage(
-            modifier = Modifier
+            modifier = Modifier.padding(vertical = LeafDiseaseTheme.dimensions.dimension40)
         )
 
         CoreButton(
             modifier = Modifier.padding(bottom = LeafDiseaseTheme.dimensions.dimension18),
             buttonText = stringResource(R.string.home_screen_take_photo_button),
+            buttonImage = R.drawable.ic_round_camera_alt_24,
+            buttonType = CoreButtonType.PRIMARY,
             onClick = {}
         )
 
         CoreButton(
             buttonText = stringResource(R.string.home_screen_upload_image_button),
+            buttonImage = R.drawable.ic_baseline_image_24,
+            buttonType = CoreButtonType.SECONDARY,
             onClick = {}
         )
     }
@@ -83,7 +87,7 @@ fun HomeImage(
         .height(LeafDiseaseTheme.dimensions.dimension180)
         .border(
             width = LeafDiseaseTheme.dimensions.dimension4,
-            color = LeafDiseaseTheme.colors.onBackground,
+            color = LeafDiseaseTheme.colors.onTertiaryContainer,
             shape = RoundedCornerShape(LeafDiseaseTheme.dimensions.dimension24)
         )
         .clip(RoundedCornerShape(LeafDiseaseTheme.dimensions.dimension24))
@@ -120,7 +124,7 @@ fun HomeImage(
 
                 Text(
                     text = stringResource(R.string.home_screen_image_content).uppercase(),
-                    style = LeafDiseaseTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    style = LeafDiseaseTheme.customTypography.cardTitle,
                     textAlign = TextAlign.Center,
                     color = LeafDiseaseTheme.colors.background
                 )

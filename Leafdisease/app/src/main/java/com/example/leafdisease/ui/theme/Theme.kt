@@ -1,34 +1,23 @@
 package com.example.leafdisease.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = YellowGreen,
-    secondary = CharcoalBlue,
-    tertiary = LimeCream
-)
+private val DarkColorScheme = leafDarkColorScheme()
 
-private val LightColorScheme = lightColorScheme(
-    primary = BrightFern,
-    secondary = ShadowGrey,
-    tertiary = ForestMoss,
-    background = LavenderMist,
-    onBackground = LimeCream,
-)
+private val LightColorScheme = leafLightColorScheme()
 
 @Composable
 fun LeafDiseaseTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -43,13 +32,24 @@ fun LeafDiseaseTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = LeafTypography,
         content = content
     )
 }
 
+/**
+ * Object to access theme properties directly.
+ * The colors adapt to the current theme (light/dark).
+ */
 object LeafDiseaseTheme {
-    val colors = LightColorScheme
-    val dimensions = AppDimensions
-    val typography = Typography
+    val colors: ColorScheme
+        @Composable
+        get() = MaterialTheme.colorScheme
+    val dimensions: Dimensions
+        get() = AppDimensions
+    val typography: Typography
+        @Composable
+        get() = MaterialTheme.typography
+    val customTypography: CustomTypography
+        get() = CustomLeafTypography
 }
