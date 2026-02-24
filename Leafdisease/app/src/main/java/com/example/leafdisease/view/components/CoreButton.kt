@@ -82,6 +82,7 @@ fun getStrokeColor(buttonType: CoreButtonType): Color {
     return when (buttonType) {
         CoreButtonType.PRIMARY -> LeafDiseaseTheme.colors.primary
         CoreButtonType.SECONDARY -> LeafDiseaseTheme.colors.onSurface
+        CoreButtonType.CANCEL -> LeafDiseaseTheme.colors.primaryContainer
     }
 }
 
@@ -89,7 +90,7 @@ fun getStrokeColor(buttonType: CoreButtonType): Color {
 fun getTintColor(buttonType: CoreButtonType): Color {
     return when (buttonType) {
         CoreButtonType.PRIMARY -> LeafDiseaseTheme.colors.surface
-        CoreButtonType.SECONDARY -> LeafDiseaseTheme.colors.primary
+        CoreButtonType.SECONDARY, CoreButtonType.CANCEL -> LeafDiseaseTheme.colors.primary
     }
 }
 
@@ -108,12 +109,18 @@ fun getButtonColors(buttonType: CoreButtonType): ButtonColors {
             disabledContainerColor = LeafDiseaseTheme.colors.background.copy(alpha = 0.38f),
             disabledContentColor = LeafDiseaseTheme.colors.onBackground.copy(alpha = 0.38f)
         )
+        CoreButtonType.CANCEL -> ButtonColors(
+            containerColor = LeafDiseaseTheme.colors.primaryContainer,
+            contentColor = LeafDiseaseTheme.colors.primary,
+            disabledContainerColor = LeafDiseaseTheme.colors.background.copy(alpha = 0.38f),
+            disabledContentColor = LeafDiseaseTheme.colors.onBackground.copy(alpha = 0.38f)
+        )
     }
 }
 
 
 enum class CoreButtonType {
-    PRIMARY, SECONDARY
+    PRIMARY, SECONDARY, CANCEL
 }
 
 @Preview
@@ -128,15 +135,22 @@ fun CoreButtonPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CoreButton(
-                buttonText = "Take Photo",
-                buttonImage = R.drawable.ic_round_camera_alt_24,
-                buttonType = CoreButtonType.PRIMARY,
-                onClick = {}
+                    buttonText = "Take Photo",
+            buttonImage = R.drawable.ic_round_camera_alt_24,
+            buttonType = CoreButtonType.PRIMARY,
+            onClick = {}
             )
             CoreButton(
                 buttonText = "Upload Image",
                 buttonImage = R.drawable.ic_baseline_image_24,
                 buttonType = CoreButtonType.SECONDARY,
+                onClick = {}
+            )
+
+            CoreButton(
+                buttonText = "Cancel analysis",
+                buttonImage = R.drawable.ic_close_24,
+                buttonType = CoreButtonType.CANCEL,
                 onClick = {}
             )
         }

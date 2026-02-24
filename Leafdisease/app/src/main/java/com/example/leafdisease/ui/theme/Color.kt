@@ -10,6 +10,8 @@ val ForestMoss = Color(0xFF4C8A20)
 val BrightFern = Color(0xFF70B426)
 val YellowGreen = Color(0xFF93DD2C)
 val LimeCream = Color(0xFFC3E691)
+val TeaGreen = Color(0xFFDBEBC3)
+
 val Porcelain = Color(0xFFf9f7f3)
 val LavenderGrey = Color(0xFF9C9CA5)
 val CharcoalBlue = Color(0xFF454955)
@@ -24,7 +26,7 @@ fun leafLightColorScheme(): ColorScheme =
     lightColorScheme(
         primary = BrightFern,
         onPrimary = Onyx,
-        primaryContainer = LimeCream,
+        primaryContainer = TeaGreen,
         onPrimaryContainer = ForestMoss,
         secondary = CharcoalBlue,
         onSecondary = Porcelain,

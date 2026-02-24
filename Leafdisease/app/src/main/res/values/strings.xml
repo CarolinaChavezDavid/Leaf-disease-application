@@ -8,4 +8,31 @@
     <string name="home_screen_take_photo_button">Tomar foto</string>
     <string name="home_screen_upload_image_button">Subir desde la galería</string>
 
+    <!-- Analyzing screen -->
+    <string name="analyzing_screen_title">Análisis de la Planta</string>
+    <string name="analyzing_title">Analizando su planta...</string>
+    <string name="analyzing_subtitle">Nuestra IA está identificando posibles problemas e indicadores de salud.</string>
+    <string name="analyzing_step_species">IDENTIFICANDO ESPECIE</string>
+    <string name="analyzing_pattern_search">Buscando patrones de hongos...</string>
+    <string name="analyzing_cancel_button">Cancelar Análisis</string>
+    <string name="analyzing_footer">IMPULSADO POR FLORAAI VISION V4.2</string>
+
+    <!-- Result screen -->
+    <string name="result_screen_title">Resultados del Diagnóstico</string>
+    <string name="result_diagnosis_label">DIAGNÓSTICO</string>
+    <string name="result_disease_name">Tizón Tardío</string>
+    <string name="result_scientific_name">Phytophthora infestans</string>
+    <string name="result_infected_status">INFECTADO</string>
+    <string name="result_pathogen_tag">Alternaria Contagiosa</string>
+    <string name="result_fungus_tag">Patógeno Fúngico</string>
+    <string name="result_action_title">Qué hacer a continuación</string>
+    <string name="result_action_1_title">Eliminar Plantas Infectadas</string>
+    <string name="result_action_1_desc">Podar con cuidado y destruir todas las hojas y tallos con manchas. No los deje para compostar.</string>
+    <string name="result_action_2_title">Aplicar Fungicida</string>
+    <string name="result_action_2_desc">Use un fungicida a base de cobre en todo el follaje sano restante para evitar la propagación.</string>
+    <string name="result_action_3_title">Mejorar la Ventilación</string>
+    <string name="result_action_3_desc">Espacie más sus plantas y asegúrese de que haya buena circulación de aire alrededor.</string>
+    <string name="result_encyclopedia_link">Enciclopedia Completa de Enfermedades</string>
+    <string name="result_scan_another_button">Escanear otra Planta</string>
+
 </resources>

@@ -24,11 +24,76 @@ val InterFontFamily = FontFamily(
 // Custom styles beyond Material3 standard
 data class CustomTypography(
     val header: TextStyle,
+    val headerMedium: TextStyle,
     val subtitle: TextStyle,
+    val subtitleMedium: TextStyle,
+
     val cardTitle: TextStyle,
     val buttonText: TextStyle,
     val caption: TextStyle,
     val overline: TextStyle
+)
+
+// Custom typography extension (separate from Material3)
+val CustomLeafTypography = CustomTypography(
+    header = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 32.sp,
+        lineHeight = 48.sp,
+        letterSpacing = (-0.5).sp
+    ),
+    headerMedium = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 26.sp,
+        lineHeight = 48.sp,
+        letterSpacing = (-0.5).sp
+    ),
+    subtitle = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp,
+        color = androidx.compose.ui.graphics.Color.Gray
+    ),
+    subtitleMedium = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp,
+        color = androidx.compose.ui.graphics.Color.Gray
+    ),
+    cardTitle = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.1.sp
+    ),
+    buttonText = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 32.sp,
+        letterSpacing = 0.sp
+    ),
+    caption = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp,
+        lineHeight = 14.sp,
+        letterSpacing = 0.4.sp
+    ),
+    overline = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 10.sp,
+        lineHeight = 14.sp,
+        letterSpacing = 1.5.sp
+    )
 )
 
 // Standard Material3 Typography (used by MaterialTheme)
@@ -148,49 +213,3 @@ val LeafTypography = Typography(
     ),
 )
 
-// Custom typography extension (separate from Material3)
-val CustomLeafTypography = CustomTypography(
-    header = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 32.sp,
-        lineHeight = 48.sp,
-        letterSpacing = (-0.5).sp
-    ),
-    subtitle = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp,
-        color = androidx.compose.ui.graphics.Color.Gray
-    ),
-    cardTitle = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.1.sp
-    ),
-    buttonText = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp
-    ),
-    caption = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 10.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 0.4.sp
-    ),
-    overline = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 1.5.sp
-    )
-)

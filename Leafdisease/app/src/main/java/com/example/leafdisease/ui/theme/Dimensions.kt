@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 class Dimensions {
     val dimension0 = 0.dp
     val dimension1 = 1.dp
+    val dimension3 = 3.dp
 
     val dimension2 = 2.dp
     val dimension4 = 4.dp
@@ -58,6 +59,7 @@ class Dimensions {
     val dimension144 = 144.dp
     val dimension148 = 148.dp
     val dimension180 = 180.dp
+    val dimension200 = 200.dp
     val dimension240 = 240.dp
     val dimension360 = 360.dp
     val dimension480 = 480.dp
