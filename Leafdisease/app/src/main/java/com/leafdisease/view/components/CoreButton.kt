@@ -1,4 +1,4 @@
-package com.example.leafdisease.view.components
+package com.leafdisease.view.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.leafdisease.R
-import com.example.leafdisease.ui.theme.LeafDiseaseTheme
+import com.leafdisease.R
+import com.leafdisease.ui.theme.LeafDiseaseTheme
 
 @Composable
 fun CoreButton(
@@ -63,7 +63,7 @@ fun CoreButton(
             Icon(
                 painter = painterResource(buttonImage),
                 contentDescription = null,
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .height(LeafDiseaseTheme.dimensions.dimension24)
                     .padding(end = LeafDiseaseTheme.dimensions.dimension8),
                 tint = getTintColor(buttonType)
@@ -135,10 +135,10 @@ fun CoreButtonPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             CoreButton(
-                    buttonText = "Take Photo",
-            buttonImage = R.drawable.ic_round_camera_alt_24,
-            buttonType = CoreButtonType.PRIMARY,
-            onClick = {}
+                buttonText = "Take Photo",
+                buttonImage = R.drawable.ic_round_camera_alt_24,
+                buttonType = CoreButtonType.PRIMARY,
+                onClick = {}
             )
             CoreButton(
                 buttonText = "Upload Image",

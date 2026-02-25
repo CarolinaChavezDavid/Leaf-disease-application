@@ -1,12 +1,13 @@
-package com.example.leafdisease.ui.theme
+package com.leafdisease.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.leafdisease.R
+import com.leafdisease.R
 
 // Inter font family with available weights
 val InterFontFamily = FontFamily(
@@ -27,7 +28,7 @@ data class CustomTypography(
     val headerMedium: TextStyle,
     val subtitle: TextStyle,
     val subtitleMedium: TextStyle,
-
+    val headerSmall: TextStyle,
     val cardTitle: TextStyle,
     val buttonText: TextStyle,
     val caption: TextStyle,
@@ -46,7 +47,14 @@ val CustomLeafTypography = CustomTypography(
     headerMedium = TextStyle(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 26.sp,
+        fontSize = 22.sp,
+        lineHeight = 48.sp,
+        letterSpacing = (-0.5).sp
+    ),
+    headerSmall = TextStyle(
+        fontFamily = InterFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
         lineHeight = 48.sp,
         letterSpacing = (-0.5).sp
     ),
@@ -56,15 +64,15 @@ val CustomLeafTypography = CustomTypography(
         fontSize = 20.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
-        color = androidx.compose.ui.graphics.Color.Gray
+        color = Color.Gray
     ),
     subtitleMedium = TextStyle(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 28.sp,
+        lineHeight = 18.sp,
         letterSpacing = 0.sp,
-        color = androidx.compose.ui.graphics.Color.Gray
+        color = Color.Gray
     ),
     cardTitle = TextStyle(
         fontFamily = InterFontFamily,

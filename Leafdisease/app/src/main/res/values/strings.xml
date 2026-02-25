@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Leaf disease</string>
+    <string name="app_name">Leaf Scan</string>
 
     // Home screen
     <string name="home_screen_header">Los cultivos sanos empiezan aquí</string>

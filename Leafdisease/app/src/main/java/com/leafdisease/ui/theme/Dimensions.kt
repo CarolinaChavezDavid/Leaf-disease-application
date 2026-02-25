@@ -1,4 +1,4 @@
-package com.example.leafdisease.ui.theme
+package com.leafdisease.ui.theme
 
 import androidx.compose.ui.unit.dp
 

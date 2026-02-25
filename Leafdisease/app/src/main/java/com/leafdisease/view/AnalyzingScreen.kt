@@ -1,4 +1,4 @@
-package com.example.leafdisease.view
+package com.leafdisease.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.leafdisease.R
-import com.example.leafdisease.ui.theme.LeafDiseaseTheme
-import com.example.leafdisease.view.components.CoreButton
-import com.example.leafdisease.view.components.CoreButtonType
+import com.leafdisease.R
+import com.leafdisease.ui.theme.LeafDiseaseTheme
+import com.leafdisease.view.components.CoreButton
+import com.leafdisease.view.components.CoreButtonType
+import com.leafdisease.view.components.ScreenHeader
 
 @Composable
 fun AnalyzingScreen(
@@ -45,46 +44,31 @@ fun AnalyzingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(LeafDiseaseTheme.colors.background)
-            .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+            .background(LeafDiseaseTheme.colors.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top App Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = LeafDiseaseTheme.dimensions.dimension16),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_round_arrow_back_24),
-                    contentDescription = "Back",
-                    tint = LeafDiseaseTheme.colors.onBackground
-                )
-            }
-            Text(
-                text = stringResource(R.string.analyzing_screen_title),
-                style = LeafDiseaseTheme.typography.titleLarge,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
-            // Spacer to balance the IconButton width
-            Spacer(modifier = Modifier.size(48.dp))
-        }
+
+        ScreenHeader(
+            text = stringResource(R.string.analyzing_screen_title),
+            image = R.drawable.ic_round_arrow_left_24,
+            onIconClicked = {}
+        )
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Plant Image with Scanning Overlay
         PlantScanningImage(
-            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension180)
-        )
+            modifier = Modifier
+                .size(LeafDiseaseTheme.dimensions.dimension180)
+                .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+            )
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension32))
 
         // Leaf Icon with Circle Background
         Box(
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .size(LeafDiseaseTheme.dimensions.dimension64)
                 .clip(CircleShape)
                 .background(LeafDiseaseTheme.colors.primaryContainer),
@@ -93,26 +77,28 @@ fun AnalyzingScreen(
             Icon(
                 painter = painterResource(R.drawable.ic_leaf_24),
                 contentDescription = null,
-                modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension32),
+                modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension32),
                 tint = LeafDiseaseTheme.colors.primary
             )
         }
 
-        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension16))
+        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension16))
 
         // Analyzing Title
         Text(
+            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
             text = stringResource(R.string.analyzing_title),
             style = LeafDiseaseTheme.customTypography.headerMedium,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension8))
+        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension8))
 
         // Analyzing Subtitle
         Text(
+            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
             text = stringResource(R.string.analyzing_subtitle),
-            style = LeafDiseaseTheme.customTypography.subtitle,
+            style = LeafDiseaseTheme.customTypography.subtitleMedium,
             textAlign = TextAlign.Center,
             color = LeafDiseaseTheme.colors.onSurfaceVariant
         )
@@ -121,6 +107,7 @@ fun AnalyzingScreen(
 
         // Progress Section
         ProgressSection(
+            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
             label = stringResource(R.string.analyzing_step_species),
             progress = 0.74f,
             progressText = "74%"
@@ -131,7 +118,9 @@ fun AnalyzingScreen(
 
         // Cancel Button
         CoreButton(
-            modifier = Modifier.padding(bottom = LeafDiseaseTheme.dimensions.dimension16),
+            modifier = Modifier
+                .padding(bottom = LeafDiseaseTheme.dimensions.dimension16)
+                .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
             buttonText = stringResource(R.string.analyzing_cancel_button),
             buttonImage = R.drawable.ic_close_24,
             buttonType = CoreButtonType.CANCEL,
@@ -271,9 +260,10 @@ fun ScanningOverlay(modifier: Modifier = Modifier) {
 fun ProgressSection(
     label: String,
     progress: Float,
-    progressText: String
+    progressText: String,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -292,7 +282,7 @@ fun ProgressSection(
             )
         }
 
-        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension8))
+        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension8))
 
         LinearProgressIndicator(
             progress = { progress },
@@ -319,12 +309,12 @@ fun AnalysisStepItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension20),
+            modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension20),
             color = LeafDiseaseTheme.colors.primary,
             strokeWidth = LeafDiseaseTheme.dimensions.dimension2
         )
 
-        Spacer(modifier = Modifier.width(LeafDiseaseTheme.dimensions.dimension12))
+        Spacer(modifier = Modifier.Companion.width(LeafDiseaseTheme.dimensions.dimension12))
 
         Text(
             text = text,

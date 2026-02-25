@@ -1,4 +1,4 @@
-package com.example.leafdisease.ui.theme
+package com.leafdisease.ui.theme
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
