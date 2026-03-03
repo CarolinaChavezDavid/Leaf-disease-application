@@ -35,4 +35,12 @@
     <string name="result_encyclopedia_link">Enciclopedia Completa de Enfermedades</string>
     <string name="result_scan_another_button">Escanear otra Planta</string>
 
+    <!-- Take Photo screen -->
+    <string name="take_photo_title">Capturar Imagen</string>
+    <string name="take_photo_instructions">Centra la hoja de la planta en el área de enfoque para un mejor análisis</string>
+    <string name="focus_area_description">Área de enfoque</string>
+    <string name="focus_instruction">Enfoca la hoja aquí</string>
+    <string name="take_photo_button">Tomar foto</string>
+    <string name="open_gallery">Abrir galería</string>
+
 </resources>

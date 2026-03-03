@@ -35,7 +35,10 @@ import com.leafdisease.view.components.ScreenHeader
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onTakePhoto: () -> Unit = {},
+    onUploadImage: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,14 +81,14 @@ fun HomeScreen() {
                 buttonText = stringResource(R.string.home_screen_take_photo_button),
                 buttonImage = R.drawable.ic_round_camera_alt_24,
                 buttonType = CoreButtonType.PRIMARY,
-                onClick = {}
+                onClick = onTakePhoto
             )
 
             CoreButton(
                 buttonText = stringResource(R.string.home_screen_upload_image_button),
                 buttonImage = R.drawable.ic_baseline_image_24,
                 buttonType = CoreButtonType.SECONDARY,
-                onClick = {}
+                onClick = onUploadImage
             )
         }
     }
