@@ -57,8 +57,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.material3.adaptive.navigation3)
 
-    // Kotlin Serialization
-    implementation(libs.kotlinx.serialization.core)
+    // TensorFlow Lite
+    implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.support)
+    implementation(libs.tensorflow.lite.gpu)
 
     // CameraX
     implementation(libs.androidx.camera.core)

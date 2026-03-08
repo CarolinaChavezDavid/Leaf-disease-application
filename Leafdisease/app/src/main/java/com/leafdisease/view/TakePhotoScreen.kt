@@ -2,6 +2,7 @@ package com.leafdisease.view
 
 import android.content.Context
 import android.util.Log
+import android.view.ViewTreeObserver
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,6 +59,7 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import androidx.camera.core.Preview as CameraPreview
+import androidx.core.content.ContextCompat
 
 @Composable
 fun TakePhotoScreen(
@@ -82,6 +85,7 @@ fun TakePhotoScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(LeafDiseaseTheme.colors.background)
+            .statusBarsPadding()
     ) {
         // Header
         ScreenHeader(
@@ -287,47 +291,80 @@ private fun CameraBinder(
     onError: () -> Unit
 ) {
     DisposableEffect(previewView) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        var cameraProvider: ProcessCameraProvider? = null
+        var isBound = false
 
-        val cameraProvider = try {
-            cameraProviderFuture.get()
-        } catch (e: Exception) {
-            Log.e("TakePhotoScreen", "Failed to get camera provider", e)
-            onError()
-            return@DisposableEffect onDispose { }
+        val startCamera = {
+            try {
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+
+                cameraProviderFuture.addListener({
+                    try {
+                        cameraProvider = cameraProviderFuture.get()
+
+                        // Preview use case
+                        val preview = CameraPreview.Builder()
+                            .build()
+                            .also {
+                                it.setSurfaceProvider(previewView.surfaceProvider)
+                            }
+
+                        // Image capture use case
+                        val imageCapture = ImageCapture.Builder()
+                            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                            .build()
+
+                        // Select back camera
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                        // Unbind all use cases before rebinding
+                        cameraProvider?.unbindAll()
+
+                        // Bind use cases to camera
+                        cameraProvider?.bindToLifecycle(
+                            lifecycleOwner,
+                            cameraSelector,
+                            preview,
+                            imageCapture
+                        )
+
+                        isBound = true
+                        onImageCaptureReady(imageCapture)
+                    } catch (e: Exception) {
+                        Log.e("TakePhotoScreen", "Use case binding failed", e)
+                        onError()
+                    }
+                }, ContextCompat.getMainExecutor(context))
+            } catch (e: Exception) {
+                Log.e("TakePhotoScreen", "Failed to start camera", e)
+                onError()
+            }
         }
 
-        val preview = CameraPreview.Builder()
-            .build()
-            .also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
+        // Wait for the view to be laid out before starting camera
+        if (previewView.width > 0 && previewView.height > 0) {
+            startCamera()
+        } else {
+            val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    previewView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    if (previewView.width > 0 && previewView.height > 0) {
+                        startCamera()
+                    } else {
+                        onError()
+                    }
+                }
             }
-
-        val imageCapture = ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .build()
-
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-        try {
-            cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                lifecycleOwner,
-                cameraSelector,
-                preview,
-                imageCapture
-            )
-            onImageCaptureReady(imageCapture)
-        } catch (e: Exception) {
-            Log.e("TakePhotoScreen", "Use case binding failed", e)
-            onError()
+            previewView.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
         }
 
         onDispose {
-            try {
-                cameraProvider.unbindAll()
-            } catch (e: Exception) {
-                Log.e("TakePhotoScreen", "Failed to unbind camera", e)
+            if (isBound) {
+                try {
+                    cameraProvider?.unbindAll()
+                } catch (e: Exception) {
+                    Log.e("TakePhotoScreen", "Failed to unbind camera", e)
+                }
             }
         }
     }
