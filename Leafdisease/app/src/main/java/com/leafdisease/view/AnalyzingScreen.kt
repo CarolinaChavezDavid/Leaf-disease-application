@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -41,6 +40,7 @@ import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
 import com.leafdisease.view.components.ScreenHeader
+import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.viewmodel.AnalysisState
 import com.leafdisease.viewmodel.AnalysisViewModel
 import java.io.File
@@ -48,9 +48,10 @@ import java.io.File
 @Composable
 fun AnalyzingScreen(
     imagePath: String,
+    imageRotation: Int = 0,
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    onAnalysisComplete: (Boolean, String?) -> Unit = { _, _ -> },
+    onAnalysisComplete: (Boolean, ClassificationResult?) -> Unit = { _, _ -> },
     viewModel: AnalysisViewModel = viewModel(factory = AnalysisViewModel.Factory(androidx.compose.ui.platform.LocalContext.current))
 ) {
     val analysisState by viewModel.analysisState.collectAsState()
@@ -58,18 +59,18 @@ fun AnalyzingScreen(
     // Initialize and start analysis
     LaunchedEffect(imagePath) {
         viewModel.initializeClassifier()
-        viewModel.analyzeImage(imagePath)
+        viewModel.analyzeImage(imagePath, imageRotation)
     }
 
     // Handle state changes
     LaunchedEffect(analysisState) {
         when (val state = analysisState) {
             is AnalysisState.Success -> {
-                // Navigate to result screen with the classification result
-                onAnalysisComplete(true, state.result.diseaseName)
+                // Navigate to result screen with the full classification result
+                onAnalysisComplete(true, state.result)
             }
             is AnalysisState.Error -> {
-                // Could show error dialog or retry option
+                onAnalysisComplete(false, null)
             }
             else -> { /* Continue showing progress */ }
         }

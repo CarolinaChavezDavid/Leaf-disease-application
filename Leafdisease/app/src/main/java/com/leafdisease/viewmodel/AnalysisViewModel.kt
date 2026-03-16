@@ -3,13 +3,12 @@ package com.leafdisease.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.ml.LeafDiseaseClassifier
-import com.leafdisease.ml.TfliteClassifier
+import com.leafdisease.ml.PlantDiseaseClassifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +43,7 @@ class AnalysisViewModel(
 
     private var classifier: LeafDiseaseClassifier? = null
     private var currentImagePath: String? = null
+    private var currentImageRotation: Int = 0
 
     companion object {
         private const val PREPROCESS_STEPS = 30
@@ -61,9 +61,8 @@ class AnalysisViewModel(
 
                 // Initialize classifier on background thread
                 withContext(Dispatchers.IO) {
-                    classifier = TfliteClassifier(
+                    classifier = PlantDiseaseClassifier(
                         context = context,
-                        modelPath = "model.tflite",
                         useGpu = false // Set to true if GPU delegate is available
                     )
                 }
@@ -85,9 +84,11 @@ class AnalysisViewModel(
     /**
      * Analyze an image file.
      * @param imagePath Path to the captured/selected image
+     * @param rotationDegrees Rotation of the image in degrees
      */
-    fun analyzeImage(imagePath: String) {
+    fun analyzeImage(imagePath: String, rotationDegrees: Int = 0) {
         currentImagePath = imagePath
+        currentImageRotation = rotationDegrees
 
         viewModelScope.launch {
             try {
@@ -107,9 +108,9 @@ class AnalysisViewModel(
                     delay(STEP_DELAY_MS)
                 }
 
-                // Perform actual inference
+                // Perform actual inference with rotation
                 val result = withContext(Dispatchers.Default) {
-                    classifier?.classify(bitmap)
+                    classifier?.classify(bitmap, rotationDegrees)
                 }
 
                 if (result != null) {

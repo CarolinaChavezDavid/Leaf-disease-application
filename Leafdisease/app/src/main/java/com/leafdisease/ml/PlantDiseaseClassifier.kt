@@ -4,18 +4,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
+import com.google.ai.edge.litert.TensorBuffer
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.PlantDiseaseInfo
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.GpuDelegate
-import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.ops.NormalizeOp
-import org.tensorflow.lite.support.image.ImageProcessor
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.image.ops.Rot90Op
-import org.tensorflow.lite.support.label.TensorLabel
-import org.tensorflow.lite.support.model.Model
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -42,9 +36,8 @@ interface LeafDiseaseClassifier {
  * TensorFlow Lite implementation of the leaf disease classifier.
  * Uses MobileNetV2 model trained on PlantVillage dataset.
  */
-class TfliteClassifier(
+class PlantDiseaseClassifier(
     private val context: Context,
-    private val modelPath: String = "model.tflite",
     private val useGpu: Boolean = false
 ) : LeafDiseaseClassifier {
 
@@ -56,15 +49,31 @@ class TfliteClassifier(
         private const val STD = 255f // Normalization std (0-1 range)
         private const val CONFIDENCE_THRESHOLD = 0.5f
         private const val NUM_THREADS = 4
+        private const val LABELS_PATH: String = "labels.txt"
     }
+
+    val model = Mobilenetv2V3Fp16.newInstance(context)
+
+    private val labels: List<String> by lazy {
+        runCatching { FileUtil.loadLabels(context, "labels.txt") }
+            .getOrElse { emptyList() }
+    }
+
+    // Creates inputs for reference.
+    val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+    inputFeature0.loadBuffer(byteBuffer)
+
+    // Runs model inference and gets result.
+    val outputs = model.process(inputFeature0)
+    val outputFeature0 = outputs.outputFeature0AsTensorBuffer
+
+    // Releases model resources if no longer used.
+    model.close()
+
 
     private var interpreter: Interpreter? = null
     private var gpuDelegate: GpuDelegate? = null
-    private var inputImageBuffer: TensorImage
-    private var outputBuffer: ByteBuffer
     private val labels: List<String>
-
-    private val imageProcessor: ImageProcessor
 
     init {
         try {
@@ -75,22 +84,9 @@ class TfliteClassifier(
             // Load labels
             labels = loadLabels()
 
-            // Initialize input/output buffers
-            inputImageBuffer = TensorImage.fromBitmap(
-                Bitmap.createBitmap(INPUT_SIZE, INPUT_SIZE, Bitmap.Config.ARGB_8888)
-            )
 
-            // Output buffer for float array [batch_size, num_classes]
-            outputBuffer = ByteBuffer.allocateDirect(4 * NUM_CLASSES).apply {
-                order(ByteOrder.nativeOrder())
-            }
 
-            // Image preprocessing pipeline
-            imageProcessor = ImageProcessor.Builder()
-                .add(ResizeOp(INPUT_SIZE, INPUT_SIZE, ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
-                .add(Rot90Op(-rotationDegrees / 90))
-                .add(NormalizeOp(MEAN, STD))
-                .build()
+
 
             Log.d(TAG, "Classifier initialized successfully with ${labels.size} classes")
         } catch (e: Exception) {
@@ -99,17 +95,6 @@ class TfliteClassifier(
         }
     }
 
-    /**
-     * Load the TFLite model from assets.
-     */
-    private fun loadModel(): ByteBuffer {
-        return try {
-            FileUtil.loadMappedFile(context, modelPath)
-        } catch (e: IOException) {
-            Log.e(TAG, "Error loading model from assets/$modelPath", e)
-            throw e
-        }
-    }
 
     /**
      * Create interpreter with optimized settings.
@@ -129,9 +114,9 @@ class TfliteClassifier(
      */
     private fun loadLabels(): List<String> {
         return try {
-            FileUtil.loadLabels(context, "labels.txt")
+            FileUtil.loadLabels(context, LABELS_PATH)
         } catch (e: IOException) {
-            Log.w(TAG, "Labels file not found, using PlantVillage default labels")
+            Log.w(TAG, " $e Labels file not found, using PlantVillage default labels")
             PlantDiseaseInfo.getAllDiseaseNames()
         }
     }
@@ -145,18 +130,27 @@ class TfliteClassifier(
         return try {
             val startTime = SystemClock.uptimeMillis()
 
-            // Load and preprocess image
-            inputImageBuffer.load(bitmap)
+            // Create image processor with the correct rotation for this image
+            val imageProcessor = ImageProcessor.Builder()
+                .add(ResizeOp(INPUT_SIZE, INPUT_SIZE, ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+                .add(Rot90Op(-rotationDegrees / 90))
+                .add(NormalizeOp(MEAN, STD))
+                .build()
+
+            // Create fresh input buffer and load image
+            val inputImageBuffer = TensorImage.fromBitmap(bitmap)
             val processedImage = imageProcessor.process(inputImageBuffer)
 
-            // Clear output buffer
-            outputBuffer.rewind()
+            // Output buffer for float array [batch_size, num_classes]
+            val outputBuffer = ByteBuffer.allocateDirect(4 * NUM_CLASSES).apply {
+                order(ByteOrder.nativeOrder())
+            }
 
             // Run inference
             interpreter?.run(processedImage.buffer, outputBuffer)
 
             // Get results
-            val results = parseResults()
+            val results = parseResults(outputBuffer)
 
             val inferenceTime = SystemClock.uptimeMillis() - startTime
             Log.d(TAG, "Inference completed in ${inferenceTime}ms")
@@ -171,7 +165,7 @@ class TfliteClassifier(
     /**
      * Parse the raw output buffer into classification results.
      */
-    private fun parseResults(): List<ClassificationResult> {
+    private fun parseResults(outputBuffer: ByteBuffer): List<ClassificationResult> {
         outputBuffer.rewind()
         val probabilities = FloatArray(NUM_CLASSES)
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +21,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,12 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.leafdisease.R
+import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.ui.theme.LeafDiseaseTheme
+import com.leafdisease.domain.model.TreatmentStep
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
 import com.leafdisease.view.components.ScreenHeader
@@ -45,6 +45,7 @@ import com.leafdisease.view.components.ScreenHeader
 fun ResultScreen(
     onBackClick: () -> Unit = {},
     onScanAnotherClick: () -> Unit = {},
+    result: ClassificationResult
 ) {
     Column(
         modifier = Modifier
@@ -60,7 +61,7 @@ fun ResultScreen(
             onIconClicked = {}
         )
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension24))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Plant Image Card
         PlantResultImage(
@@ -69,25 +70,27 @@ fun ResultScreen(
                 .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
         )
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension24))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Diagnosis Section
         DiagnosisSection(
-            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
+            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+            result = result
         )
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension24))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Pathogen Tags
         PathogenTags(
             modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
         )
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension32))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension32))
 
         // Action Items Section
         ActionItemsSection(
-            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
+            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+            result = result
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -151,7 +154,8 @@ fun PlantResultImage(
 
 @Composable
 fun DiagnosisSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    result: ClassificationResult
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -168,11 +172,11 @@ fun DiagnosisSection(
                 letterSpacing = 1.5.sp
             )
 
-            Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension4))
+            Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension4))
 
             // Disease Name
             Text(
-                text = stringResource(R.string.result_disease_name),
+                text = result.diseaseName,
                 style = LeafDiseaseTheme.customTypography.header,
                 color = LeafDiseaseTheme.colors.onBackground
             )
@@ -180,11 +184,13 @@ fun DiagnosisSection(
             Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension4))
 
             // Scientific Name
-            Text(
-                text = stringResource(R.string.result_scientific_name),
-                style = LeafDiseaseTheme.typography.bodyMedium,
-                color = LeafDiseaseTheme.colors.onSurfaceVariant
-            )
+            result.scientificName?.let {
+                Text(
+                    text = it,
+                    style = LeafDiseaseTheme.typography.bodyMedium,
+                    color = LeafDiseaseTheme.colors.onSurfaceVariant
+                )
+            }
         }
 
         // Confidence Indicator
@@ -205,7 +211,7 @@ fun ConfidenceIndicator(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension56),
+            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension56),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
@@ -223,7 +229,7 @@ fun ConfidenceIndicator(
             )
         }
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension4))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension4))
 
         Text(
             text = stringResource(R.string.result_infected_status),
@@ -244,14 +250,14 @@ fun PathogenTags(
     ) {
         // Pathogen Tag (Red/Danger)
         TagChip(
-            text = stringResource(R.string.result_pathogen_tag),
+            text = stringResource(R.string.priority_high),
             backgroundColor = LeafDiseaseTheme.colors.errorContainer,
             textColor = LeafDiseaseTheme.colors.error
         )
 
         // Fungus Type Tag (Blue/Info)
         TagChip(
-            text = stringResource(R.string.result_fungus_tag),
+            text = stringResource(R.string.priority_low),
             backgroundColor = LeafDiseaseTheme.colors.primaryContainer,
             textColor = LeafDiseaseTheme.colors.primary
         )
@@ -281,7 +287,8 @@ fun TagChip(
 
 @Composable
 fun ActionItemsSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    result: ClassificationResult
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Section Title with Icon
@@ -304,30 +311,21 @@ fun ActionItemsSection(
             )
         }
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension16))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension16))
 
-        // Action Items
-        ActionItem(
-            icon = R.drawable.ic_baseline_image_24,
-            title = stringResource(R.string.result_action_1_title),
-            description = stringResource(R.string.result_action_1_desc)
-        )
+        LazyColumn {
+            items(result.treatmentRecommendations.size) { index ->
+                val treatmentStep = result.treatmentRecommendations[index]
 
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension12))
+                ActionItem(
+                    icon = R.drawable.ic_baseline_image_24,
+                    title = "${treatmentStep.stepNumber}. ${treatmentStep.title}",
+                    description = treatmentStep.description
+                )
 
-        ActionItem(
-            icon = R.drawable.ic_round_camera_alt_24,
-            title = stringResource(R.string.result_action_2_title),
-            description = stringResource(R.string.result_action_2_desc)
-        )
-
-        Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension12))
-
-        ActionItem(
-            icon = R.drawable.ic_center_focus_strong_24,
-            title = stringResource(R.string.result_action_3_title),
-            description = stringResource(R.string.result_action_3_desc)
-        )
+                Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
+            }
+        }
     }
 }
 
@@ -355,7 +353,7 @@ fun ActionItem(
         ) {
             // Icon with background
             Box(
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .size(LeafDiseaseTheme.dimensions.dimension40)
                     .clip(CircleShape)
                     .background(LeafDiseaseTheme.colors.primaryContainer),
@@ -365,11 +363,11 @@ fun ActionItem(
                     painter = painterResource(icon),
                     contentDescription = null,
                     tint = LeafDiseaseTheme.colors.primary,
-                    modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension24)
+                    modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension24)
                 )
             }
 
-            Spacer(modifier = Modifier.Companion.width(LeafDiseaseTheme.dimensions.dimension12))
+            Spacer(modifier = Modifier.width(LeafDiseaseTheme.dimensions.dimension12))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -379,7 +377,7 @@ fun ActionItem(
                     color = LeafDiseaseTheme.colors.onSurface
                 )
 
-                Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension2))
+                Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension2))
 
                 Text(
                     text = description,
@@ -413,10 +411,10 @@ fun EncyclopediaLink(
                 painter = painterResource(R.drawable.ic_leaf_24),
                 contentDescription = null,
                 tint = LeafDiseaseTheme.colors.primary,
-                modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension24)
+                modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension24)
             )
 
-            Spacer(modifier = Modifier.Companion.width(LeafDiseaseTheme.dimensions.dimension12))
+            Spacer(modifier = Modifier.width(LeafDiseaseTheme.dimensions.dimension12))
 
             Text(
                 text = stringResource(R.string.result_encyclopedia_link),
@@ -431,7 +429,7 @@ fun EncyclopediaLink(
             painter = painterResource(R.drawable.ic_round_arrow_back_24),
             contentDescription = "Navigate",
             tint = LeafDiseaseTheme.colors.onSurfaceVariant,
-            modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension20)
+            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension20)
         )
     }
 }
@@ -439,7 +437,40 @@ fun EncyclopediaLink(
 @Preview
 @Composable
 fun ResultScreenPreview() {
+    val mockResult = ClassificationResult(
+        diseaseName = "Tomato Late Blight",
+        scientificName = "Phytophthora infestans",
+        confidence = 0.92f,
+        isHealthy = false,
+        description = "Devastating fungal disease causing brown lesions and white fungal growth on leaves and fruit. Requires immediate treatment to prevent total crop loss.",
+        treatmentRecommendations = listOf(
+            TreatmentStep(
+                stepNumber = 1,
+                title = "Remove infected plants",
+                description = "Destroy all infected plants immediately to prevent spread to healthy plants.",
+                priority = TreatmentStep.Priority.HIGH
+            ),
+            TreatmentStep(
+                stepNumber = 2,
+                title = "Apply fungicide",
+                description = "Use mancozeb or chlorothalonil urgently. Apply every 7-10 days during wet weather.",
+                priority = TreatmentStep.Priority.HIGH
+            ),
+            TreatmentStep(
+                stepNumber = 3,
+                title = "Space plants",
+                description = "Improve air circulation around plants by pruning lower leaves and ensuring proper spacing.",
+                priority = TreatmentStep.Priority.MEDIUM
+            )
+        ),
+        confidenceLevel = ClassificationResult.ConfidenceLevel.HIGH
+    )
+
     LeafDiseaseTheme {
-        ResultScreen()
+        ResultScreen(
+            result = mockResult,
+            onBackClick = {},
+            onScanAnotherClick = {}
+        )
     }
 }

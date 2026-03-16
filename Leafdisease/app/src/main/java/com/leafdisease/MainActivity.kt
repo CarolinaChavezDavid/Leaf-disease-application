@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.AnalyzingScreen
 import com.leafdisease.view.HomeScreen
@@ -33,16 +34,16 @@ class MainActivity : ComponentActivity() {
 
     private var currentScreen by mutableStateOf(Screen.HOME)
     private var capturedImagePath by mutableStateOf<String?>(null)
+    private var capturedImageRotation by mutableStateOf(0)
+    private var classificationResult by mutableStateOf<ClassificationResult?>(null)
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // Permission granted, navigate to camera
             navigateTo(Screen.TAKE_PHOTO)
         } else {
             // Permission denied, stay on home screen
-            // Could show a toast or dialog here
         }
     }
 
@@ -55,15 +56,23 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     AppNavigation(
                         currentScreen = currentScreen,
+                        capturedImagePath = capturedImagePath,
+                        capturedImageRotation = capturedImageRotation,
+                        classificationResult = classificationResult,
                         onNavigate = { screen ->
                             when (screen) {
                                 Screen.TAKE_PHOTO -> checkCameraPermissionAndNavigate()
                                 else -> navigateTo(screen)
                             }
                         },
-                        onImageCaptured = { path ->
+                        onImageCaptured = { path, rotation ->
                             capturedImagePath = path
+                            capturedImageRotation = rotation
                             navigateTo(Screen.ANALYZING)
+                        },
+                        onAnalysisComplete = { result ->
+                            classificationResult = result
+                            navigateTo(Screen.RESULT)
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -93,7 +102,6 @@ class MainActivity : ComponentActivity() {
     private fun configureSystemBars() {
         val window = window
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.isAppearanceLightStatusBars = true
     }
@@ -106,8 +114,12 @@ enum class Screen {
 @Composable
 fun AppNavigation(
     currentScreen: Screen,
+    capturedImagePath: String?,
+    capturedImageRotation: Int,
+    classificationResult: ClassificationResult?,
     onNavigate: (Screen) -> Unit,
-    onImageCaptured: (String) -> Unit,
+    onImageCaptured: (String, Int) -> Unit,
+    onAnalysisComplete: (ClassificationResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -115,11 +127,9 @@ fun AppNavigation(
         modifier = modifier,
         transitionSpec = {
             if (targetState.ordinal > initialState.ordinal) {
-                // Moving forward: slide in from right, slide out to left
                 (slideInHorizontally { width -> width } + fadeIn()) togetherWith
                 (slideOutHorizontally { width -> -width } + fadeOut())
             } else {
-                // Moving backward: slide in from left, slide out to right
                 (slideInHorizontally { width -> -width } + fadeIn()) togetherWith
                 (slideOutHorizontally { width -> width } + fadeOut())
             }
@@ -137,13 +147,34 @@ fun AppNavigation(
                 onGalleryClick = { /* Handle gallery click */ }
             )
             Screen.ANALYZING -> AnalyzingScreen(
+                imagePath = capturedImagePath ?: "",
+                imageRotation = capturedImageRotation,
                 onCancelClick = { onNavigate(Screen.HOME) },
-                onBackClick = { onNavigate(Screen.TAKE_PHOTO) }
+                onBackClick = { onNavigate(Screen.TAKE_PHOTO) },
+                onAnalysisComplete = { success, result ->
+                    if (success && result != null) {
+                        onAnalysisComplete(result)
+                    }
+                }
             )
             Screen.RESULT -> ResultScreen(
+                result = classificationResult ?: createMockResult(),
                 onBackClick = { onNavigate(Screen.HOME) },
                 onScanAnotherClick = { onNavigate(Screen.HOME) }
             )
         }
     }
+}
+
+// Fallback mock result for preview/error cases
+private fun createMockResult(): ClassificationResult {
+    return ClassificationResult(
+        diseaseName = "Unknown",
+        scientificName = null,
+        confidence = 0f,
+        isHealthy = true,
+        description = "No analysis result available.",
+        treatmentRecommendations = emptyList(),
+        confidenceLevel = ClassificationResult.ConfidenceLevel.LOW
+    )
 }

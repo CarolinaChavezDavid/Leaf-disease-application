@@ -12,6 +12,12 @@ android {
         }
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.leafdisease"
         minSdk = 24
@@ -37,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        mlModelBinding = true
     }
 }
 
@@ -57,17 +64,18 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.material3.adaptive.navigation3)
 
-    // TensorFlow Lite
-    implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.support)
-    implementation(libs.tensorflow.lite.gpu)
-
     // CameraX
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
-    
+
+    // Tensorflow lite
+    implementation(libs.litert)
+    implementation(libs.litert.support)
+    implementation(libs.litert.gpu)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

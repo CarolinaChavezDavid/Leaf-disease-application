@@ -64,7 +64,7 @@ import androidx.core.content.ContextCompat
 @Composable
 fun TakePhotoScreen(
     onBackClick: () -> Unit = {},
-    onPhotoTaken: (String) -> Unit = {},
+    onPhotoTaken: (String, Int) -> Unit = { _, _ -> },  // Pass path AND rotation
     onGalleryClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -229,13 +229,15 @@ fun TakePhotoScreen(
                 onClick = {
                     if (!isCapturing && imageCapture != null) {
                         isCapturing = true
+                        val rotation = imageCapture?.targetRotation ?: 0
                         takePhoto(
                             imageCapture = imageCapture!!,
                             context = context,
+                            rotation = rotation,
                             executor = cameraExecutor,
-                            onImageCaptured = { path ->
+                            onImageCaptured = { path, rot ->
                                 isCapturing = false
-                                onPhotoTaken(path)
+                                onPhotoTaken(path, rot)
                             },
                             onError = {
                                 isCapturing = false
@@ -373,8 +375,9 @@ private fun CameraBinder(
 private fun takePhoto(
     imageCapture: ImageCapture,
     context: Context,
+    rotation: Int,
     executor: ExecutorService,
-    onImageCaptured: (String) -> Unit,
+    onImageCaptured: (String, Int) -> Unit,
     onError: () -> Unit
 ) {
     // Create output directory
@@ -395,7 +398,7 @@ private fun takePhoto(
         executor,
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                onImageCaptured(photoFile.absolutePath)
+                onImageCaptured(photoFile.absolutePath, rotation)
             }
 
             override fun onError(exception: ImageCaptureException) {
