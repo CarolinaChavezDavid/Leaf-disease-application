@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.leafdisease.R
@@ -59,7 +60,6 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import androidx.camera.core.Preview as CameraPreview
-import androidx.core.content.ContextCompat
 
 @Composable
 fun TakePhotoScreen(
@@ -314,6 +314,10 @@ private fun CameraBinder(
                         // Image capture use case
                         val imageCapture = ImageCapture.Builder()
                             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                            // This sets the ideal size for the image to be analyse, CameraX will choose the
+                            // the most suitable resolution which may not be exactly the same or hold the same
+                            // aspect ratio
+                            .setTargetResolution(android.util.Size(224, 224))
                             .build()
 
                         // Select back camera

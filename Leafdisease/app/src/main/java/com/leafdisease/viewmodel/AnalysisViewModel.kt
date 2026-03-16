@@ -61,10 +61,7 @@ class AnalysisViewModel(
 
                 // Initialize classifier on background thread
                 withContext(Dispatchers.IO) {
-                    classifier = PlantDiseaseClassifier(
-                        context = context,
-                        useGpu = false // Set to true if GPU delegate is available
-                    )
+                    classifier = PlantDiseaseClassifier(context = context)
                 }
 
                 // Simulate model loading steps

@@ -2,17 +2,18 @@ package com.leafdisease.ml
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.os.SystemClock
 import android.util.Log
+import com.google.ai.edge.litert.Accelerator
+import com.google.ai.edge.litert.CompiledModel
+import com.google.ai.edge.litert.Environment
 import com.google.ai.edge.litert.TensorBuffer
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.PlantDiseaseInfo
-import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.GpuDelegate
 import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import kotlin.math.abs
+import kotlin.math.exp
 
 /**
  * Interface for leaf disease classification.
@@ -33,192 +34,225 @@ interface LeafDiseaseClassifier {
 }
 
 /**
- * TensorFlow Lite implementation of the leaf disease classifier.
- * Uses MobileNetV2 model trained on PlantVillage dataset.
+ * LiteRT implementation of the leaf disease classifier.
+ * Uses a compiled MobileNetV2 FP16 model from the app assets.
  */
 class PlantDiseaseClassifier(
     private val context: Context,
-    private val useGpu: Boolean = false
 ) : LeafDiseaseClassifier {
 
     companion object {
-        private const val TAG = "TfliteClassifier"
-        private const val INPUT_SIZE = 224 // MobileNetV2 input size
-        private const val NUM_CLASSES = 38 // PlantVillage classes
-        private const val MEAN = 0f // Normalization mean
-        private const val STD = 255f // Normalization std (0-1 range)
+        private const val TAG = "PlantDiseaseClassifier"
+        private const val MODEL_PATH = "mobilenetv2_v3_fp16.tflite"
+        private const val LABELS_PATH = "labels.txt"
+        private const val INPUT_SIZE = 224
+        private const val NUM_CHANNELS = 3
+        private const val NUM_CLASSES = 38
+        private const val STD = 255f
         private const val CONFIDENCE_THRESHOLD = 0.5f
-        private const val NUM_THREADS = 4
-        private const val LABELS_PATH: String = "labels.txt"
+        private const val SOFTMAX_EPSILON = 0.01f
     }
 
-    val model = Mobilenetv2V3Fp16.newInstance(context)
-
-    private val labels: List<String> by lazy {
-        runCatching { FileUtil.loadLabels(context, "labels.txt") }
-            .getOrElse { emptyList() }
-    }
-
-    // Creates inputs for reference.
-    val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
-    inputFeature0.loadBuffer(byteBuffer)
-
-    // Runs model inference and gets result.
-    val outputs = model.process(inputFeature0)
-    val outputFeature0 = outputs.outputFeature0AsTensorBuffer
-
-    // Releases model resources if no longer used.
-    model.close()
-
-
-    private var interpreter: Interpreter? = null
-    private var gpuDelegate: GpuDelegate? = null
-    private val labels: List<String>
+    private val labels: List<String> = loadLabels()
+    private var environment: Environment? = null
+    private var compiledModel: CompiledModel? = null
+    private var inputBuffers: MutableList<TensorBuffer> = mutableListOf()
+    private var outputBuffers: MutableList<TensorBuffer> = mutableListOf()
 
     init {
         try {
-            // Load model
-            val model = loadModel()
-            interpreter = createInterpreter(model)
+            environment = Environment.create()
+            environment?.let {
+                val options = createModelOptions(it)
 
-            // Load labels
-            labels = loadLabels()
+                compiledModel = CompiledModel.create(
+                    context.assets,
+                    MODEL_PATH,
+                    options,
+                    it
+                )
+            }
 
+            inputBuffers = compiledModel?.createInputBuffers()?.toMutableList() ?: mutableListOf()
+            outputBuffers = compiledModel?.createOutputBuffers()?.toMutableList() ?: mutableListOf()
 
-
-
-
-            Log.d(TAG, "Classifier initialized successfully with ${labels.size} classes")
+            Log.d(
+                TAG,
+                "Classifier initialized with accelerators=${environment?.getAvailableAccelerators()}"
+            )
         } catch (e: Exception) {
+            close()
             Log.e(TAG, "Failed to initialize classifier", e)
             throw e
         }
     }
 
-
-    /**
-     * Create interpreter with optimized settings.
-     */
-    private fun createInterpreter(model: ByteBuffer): Interpreter {
-        val options = Interpreter.Options().apply {
-            setNumThreads(NUM_THREADS)
-            useNNAPI = !useGpu // Use NNAPI if not using GPU
-            addDelegate(GpuDelegate())
-        }
-
-        return Interpreter(model, options)
-    }
-
-    /**
-     * Load disease labels from assets.
-     */
-    private fun loadLabels(): List<String> {
-        return try {
-            FileUtil.loadLabels(context, LABELS_PATH)
-        } catch (e: IOException) {
-            Log.w(TAG, " $e Labels file not found, using PlantVillage default labels")
-            PlantDiseaseInfo.getAllDiseaseNames()
-        }
-    }
-
     override fun classify(bitmap: Bitmap, rotationDegrees: Int): ClassificationResult? {
-        if (interpreter == null) {
-            Log.e(TAG, "Interpreter not initialized")
+        val model = compiledModel ?: run {
+            Log.e(TAG, "CompiledModel not initialized")
             return null
         }
 
         return try {
             val startTime = SystemClock.uptimeMillis()
+            val input = preprocessBitmap(bitmap, rotationDegrees)
 
-            // Create image processor with the correct rotation for this image
-            val imageProcessor = ImageProcessor.Builder()
-                .add(ResizeOp(INPUT_SIZE, INPUT_SIZE, ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
-                .add(Rot90Op(-rotationDegrees / 90))
-                .add(NormalizeOp(MEAN, STD))
-                .build()
+            inputBuffers.firstOrNull()?.writeFloat(input)
+                ?: error("Input tensor buffer not available")
 
-            // Create fresh input buffer and load image
-            val inputImageBuffer = TensorImage.fromBitmap(bitmap)
-            val processedImage = imageProcessor.process(inputImageBuffer)
+            model.run(inputBuffers, outputBuffers)
 
-            // Output buffer for float array [batch_size, num_classes]
-            val outputBuffer = ByteBuffer.allocateDirect(4 * NUM_CLASSES).apply {
-                order(ByteOrder.nativeOrder())
-            }
+            val rawOutput = outputBuffers.firstOrNull()?.readFloat()
+                ?: error("Output tensor buffer not available")
 
-            // Run inference
-            interpreter?.run(processedImage.buffer, outputBuffer)
-
-            // Get results
-            val results = parseResults(outputBuffer)
+            val probabilities = rawOutput.toProbabilities()
+            val maxIndex = probabilities.indices.maxByOrNull(probabilities::get) ?: return null
+            val confidence = probabilities[maxIndex]
 
             val inferenceTime = SystemClock.uptimeMillis() - startTime
             Log.d(TAG, "Inference completed in ${inferenceTime}ms")
 
-            results.firstOrNull()?.takeIf { it.confidence >= CONFIDENCE_THRESHOLD }
+            if (confidence < CONFIDENCE_THRESHOLD) {
+                return null
+            }
+
+            buildClassificationResult(maxIndex, confidence)
         } catch (e: Exception) {
             Log.e(TAG, "Error during classification", e)
             null
         }
     }
 
-    /**
-     * Parse the raw output buffer into classification results.
-     */
-    private fun parseResults(outputBuffer: ByteBuffer): List<ClassificationResult> {
-        outputBuffer.rewind()
-        val probabilities = FloatArray(NUM_CLASSES)
+    private fun createModelOptions(environment: Environment): CompiledModel.Options {
+        val availableAccelerators = environment.getAvailableAccelerators()
+        val preferredAccelerators = buildList {
+            if (availableAccelerators.contains(Accelerator.GPU)) {
+                add(Accelerator.GPU)
+            }
+            add(Accelerator.CPU)
+        }.toTypedArray()
 
-        // Read probabilities from buffer
-        for (i in 0 until NUM_CLASSES) {
-            probabilities[i] = outputBuffer.float
-        }
+        return CompiledModel.Options(*preferredAccelerators)
+    }
 
-        // Apply softmax if model doesn't include it
-        val softmaxProbabilities = applySoftmax(probabilities)
-
-        // Get top prediction
-        val maxIndex = probabilities.indices.maxByOrNull { softmaxProbabilities[it] } ?: 0
-        val maxConfidence = softmaxProbabilities[maxIndex]
-
-        val diseaseInfo = PlantDiseaseInfo.getDiseaseInfo(maxIndex)
-
-        return if (diseaseInfo != null) {
-            listOf(
-                ClassificationResult(
-                    diseaseName = diseaseInfo.diseaseName,
-                    scientificName = diseaseInfo.scientificName,
-                    confidence = maxConfidence,
-                    isHealthy = diseaseInfo.isHealthy,
-                    description = diseaseInfo.description,
-                    treatmentRecommendations = diseaseInfo.treatmentSteps,
-                    confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(maxConfidence)
-                )
-            )
-        } else {
-            emptyList()
+    private fun loadLabels(): List<String> {
+        return try {
+            context.assets.open(LABELS_PATH).bufferedReader().useLines { lines ->
+                lines.map(String::trim)
+                    .filter(String::isNotEmpty)
+                    .toList()
+            }
+        } catch (e: IOException) {
+            Log.w(TAG, "Labels file not found, using PlantDiseaseInfo defaults", e)
+            PlantDiseaseInfo.getAllDiseaseNames()
         }
     }
 
-    /**
-     * Apply softmax to raw logits.
-     */
+    private fun preprocessBitmap(bitmap: Bitmap, rotationDegrees: Int): FloatArray {
+        val rotatedBitmap = bitmap.rotate(rotationDegrees)
+        val resizedBitmap = Bitmap.createScaledBitmap(rotatedBitmap, INPUT_SIZE, INPUT_SIZE, true)
+        val pixels = IntArray(INPUT_SIZE * INPUT_SIZE)
+        val input = FloatArray(INPUT_SIZE * INPUT_SIZE * NUM_CHANNELS)
+
+        resizedBitmap.getPixels(
+            pixels,
+            0,
+            INPUT_SIZE,
+            0,
+            0,
+            INPUT_SIZE,
+            INPUT_SIZE
+        )
+
+        var offset = 0
+        for (pixel in pixels) {
+            input[offset++] = ((pixel shr 16) and 0xFF) / STD
+            input[offset++] = ((pixel shr 8) and 0xFF) / STD
+            input[offset++] = (pixel and 0xFF) / STD
+        }
+
+        if (rotatedBitmap !== bitmap && !rotatedBitmap.isRecycled) {
+            rotatedBitmap.recycle()
+        }
+        if (resizedBitmap !== rotatedBitmap && !resizedBitmap.isRecycled) {
+            resizedBitmap.recycle()
+        }
+
+        return input
+    }
+
+    private fun buildClassificationResult(
+        classIndex: Int,
+        confidence: Float,
+    ): ClassificationResult {
+        val diseaseInfo = PlantDiseaseInfo.getDiseaseInfo(classIndex)
+        if (diseaseInfo != null) {
+            return ClassificationResult(
+                diseaseName = diseaseInfo.diseaseName,
+                scientificName = diseaseInfo.scientificName,
+                confidence = confidence,
+                isHealthy = diseaseInfo.isHealthy,
+                description = diseaseInfo.description,
+                treatmentRecommendations = diseaseInfo.treatmentSteps,
+                confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
+            )
+        }
+
+        val fallbackLabel = labels.getOrNull(classIndex)
+            ?.replace("___", " - ")
+            ?.replace('_', ' ')
+            ?: "Unknown disease"
+
+        return ClassificationResult(
+            diseaseName = fallbackLabel,
+            scientificName = null,
+            confidence = confidence,
+            isHealthy = fallbackLabel.contains("healthy", ignoreCase = true),
+            description = "Prediction generated from the LiteRT model.",
+            treatmentRecommendations = emptyList(),
+            confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
+        )
+    }
+
+    private fun FloatArray.toProbabilities(): FloatArray {
+        if (size != NUM_CLASSES) {
+            Log.w(TAG, "Unexpected output size: $size")
+        }
+
+        val sum = sum()
+        val looksNormalized = sum > 0f && abs(sum - 1f) <= SOFTMAX_EPSILON && all { it in 0f..1f }
+        return if (looksNormalized) this else applySoftmax(this)
+    }
+
     private fun applySoftmax(logits: FloatArray): FloatArray {
         val maxLogit = logits.maxOrNull() ?: 0f
-        val expScores = logits.map { kotlin.math.exp(it - maxLogit) }
-        val sumExp = expScores.sum()
+        val expScores = logits.map { exp(it - maxLogit) }
+        val sumExp = expScores.sum().takeIf { it > 0f } ?: return FloatArray(logits.size)
         return expScores.map { it / sumExp }.toFloatArray()
     }
 
     override fun close() {
-        try {
-            interpreter?.close()
-            interpreter = null
-            gpuDelegate?.close()
-            gpuDelegate = null
-            Log.d(TAG, "Classifier closed successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error closing classifier", e)
+        inputBuffers.forEach(TensorBuffer::close)
+        outputBuffers.forEach(TensorBuffer::close)
+        inputBuffers.clear()
+        outputBuffers.clear()
+
+        compiledModel?.close()
+        compiledModel = null
+
+        environment?.close()
+        environment = null
+    }
+
+    private fun Bitmap.rotate(rotationDegrees: Int): Bitmap {
+        if (rotationDegrees % 360 == 0) {
+            return this
         }
+
+        val matrix = Matrix().apply {
+            postRotate(rotationDegrees.toFloat())
+        }
+
+        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 }
