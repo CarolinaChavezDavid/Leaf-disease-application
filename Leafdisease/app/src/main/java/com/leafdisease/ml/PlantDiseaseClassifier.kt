@@ -48,7 +48,8 @@ class PlantDiseaseClassifier(
         private const val INPUT_SIZE = 224
         private const val NUM_CHANNELS = 3
         private const val NUM_CLASSES = 38
-        private const val STD = 255f
+        private const val PIXEL_MEAN = 127.5f
+        private const val PIXEL_STD = 127.5f
         private const val CONFIDENCE_THRESHOLD = 0.5f
         private const val SOFTMAX_EPSILON = 0.01f
     }
@@ -166,9 +167,14 @@ class PlantDiseaseClassifier(
 
         var offset = 0
         for (pixel in pixels) {
-            input[offset++] = ((pixel shr 16) and 0xFF) / STD
-            input[offset++] = ((pixel shr 8) and 0xFF) / STD
-            input[offset++] = (pixel and 0xFF) / STD
+            val red = (pixel shr 16) and 0xFF
+            val green = (pixel shr 8) and 0xFF
+            val blue = pixel and 0xFF
+
+            // Mirrors tf.keras.applications.mobilenet_v2.preprocess_input from the training notebook.
+            input[offset++] = (red - PIXEL_MEAN) / PIXEL_STD
+            input[offset++] = (green - PIXEL_MEAN) / PIXEL_STD
+            input[offset++] = (blue - PIXEL_MEAN) / PIXEL_STD
         }
 
         if (rotatedBitmap !== bitmap && !rotatedBitmap.isRecycled) {

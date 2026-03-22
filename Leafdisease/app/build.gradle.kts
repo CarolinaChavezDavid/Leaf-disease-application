@@ -43,7 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
-        mlModelBinding = true
+        mlModelBinding = false
     }
 }
 
@@ -72,7 +72,6 @@ dependencies {
 
     // Tensorflow lite
     implementation(libs.litert)
-    implementation(libs.litert.gpu)
 
     // Testing
     testImplementation(libs.junit)

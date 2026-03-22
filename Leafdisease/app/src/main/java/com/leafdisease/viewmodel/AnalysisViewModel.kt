@@ -197,7 +197,7 @@ class AnalysisViewModel(
      */
     fun retry() {
         currentImagePath?.let { path ->
-            analyzeImage(path)
+            analyzeImage(path, currentImageRotation)
         } ?: run {
             _analysisState.value = AnalysisState.Error("No image to analyze")
         }

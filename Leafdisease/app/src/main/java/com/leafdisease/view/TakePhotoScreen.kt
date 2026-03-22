@@ -2,6 +2,7 @@ package com.leafdisease.view
 
 import android.content.Context
 import android.util.Log
+import android.view.Surface
 import android.view.ViewTreeObserver
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -229,7 +230,7 @@ fun TakePhotoScreen(
                 onClick = {
                     if (!isCapturing && imageCapture != null) {
                         isCapturing = true
-                        val rotation = imageCapture?.targetRotation ?: 0
+                        val rotation = surfaceRotationToDegrees(imageCapture?.targetRotation ?: Surface.ROTATION_0)
                         takePhoto(
                             imageCapture = imageCapture!!,
                             context = context,
@@ -411,6 +412,15 @@ private fun takePhoto(
             }
         }
     )
+}
+
+private fun surfaceRotationToDegrees(rotation: Int): Int {
+    return when (rotation) {
+        Surface.ROTATION_90 -> 90
+        Surface.ROTATION_180 -> 180
+        Surface.ROTATION_270 -> 270
+        else -> 0
+    }
 }
 
 /**
