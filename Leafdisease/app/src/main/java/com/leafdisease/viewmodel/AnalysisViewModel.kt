@@ -1,14 +1,13 @@
 package com.leafdisease.viewmodel
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.ml.LeafDiseaseClassifier
-import com.leafdisease.ml.PlantDiseaseClassifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +16,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
+const val TAG = "AnalysisViewModel"
 /**
  * States for the analysis process.
  */
@@ -35,15 +36,14 @@ sealed class AnalysisState {
  * Handles model loading, image preprocessing, and inference.
  */
 class AnalysisViewModel(
-    private val context: Context
+    private val classifier: LeafDiseaseClassifier
 ) : ViewModel() {
 
     private val _analysisState = MutableStateFlow<AnalysisState>(AnalysisState.Idle)
     val analysisState: StateFlow<AnalysisState> = _analysisState.asStateFlow()
 
-    private var classifier: LeafDiseaseClassifier? = null
     private var currentImagePath: String? = null
-    private var currentImageRotation: Int = 0
+    private var isClassifierInitialized = false
 
     companion object {
         private const val PREPROCESS_STEPS = 30
@@ -57,18 +57,17 @@ class AnalysisViewModel(
     fun initializeClassifier() {
         viewModelScope.launch {
             try {
-                _analysisState.value = AnalysisState.LoadingModel
+                if (isClassifierInitialized) return@launch
 
-                // Initialize classifier on background thread
-                withContext(Dispatchers.IO) {
-                    classifier = PlantDiseaseClassifier(context = context)
-                }
+                _analysisState.value = AnalysisState.LoadingModel
 
                 // Simulate model loading steps
                 for (i in 0..PREPROCESS_STEPS) {
                     _analysisState.value = AnalysisState.Preprocessing(i)
                     delay(STEP_DELAY_MS)
                 }
+
+                isClassifierInitialized = true
 
             } catch (e: Exception) {
                 _analysisState.value = AnalysisState.Error(
@@ -81,14 +80,14 @@ class AnalysisViewModel(
     /**
      * Analyze an image file.
      * @param imagePath Path to the captured/selected image
-     * @param rotationDegrees Rotation of the image in degrees
      */
-    fun analyzeImage(imagePath: String, rotationDegrees: Int = 0) {
+    fun analyzeImage(imagePath: String) {
         currentImagePath = imagePath
-        currentImageRotation = rotationDegrees
 
         viewModelScope.launch {
             try {
+                _analysisState.value = AnalysisState.Preprocessing(0)
+
                 // Load and preprocess image
                 val bitmap = withContext(Dispatchers.IO) {
                     loadAndPreprocessImage(imagePath)
@@ -96,6 +95,7 @@ class AnalysisViewModel(
 
                 if (bitmap == null) {
                     _analysisState.value = AnalysisState.Error("Failed to load image")
+                    Log.e(TAG, "Failed to load image")
                     return@launch
                 }
 
@@ -107,12 +107,15 @@ class AnalysisViewModel(
 
                 // Perform actual inference with rotation
                 val result = withContext(Dispatchers.Default) {
-                    classifier?.classify(bitmap, rotationDegrees)
+                    classifier.classify(bitmap)
                 }
 
                 if (result != null) {
                     _analysisState.value = AnalysisState.Success(result)
+                    Log.i(TAG, "Analysis successful $result")
                 } else {
+                    Log.e(TAG, "Analysis Failed")
+
                     _analysisState.value = AnalysisState.Error(
                         "Could not classify the image. Please try again with a clearer photo."
                     )
@@ -197,7 +200,7 @@ class AnalysisViewModel(
      */
     fun retry() {
         currentImagePath?.let { path ->
-            analyzeImage(path, currentImageRotation)
+            analyzeImage(path)
         } ?: run {
             _analysisState.value = AnalysisState.Error("No image to analyze")
         }
@@ -205,17 +208,18 @@ class AnalysisViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        classifier?.close()
     }
 
     /**
      * Factory for creating AnalysisViewModel with context.
      */
-    class Factory(private val context: Context) : ViewModelProvider.Factory {
+    class Factory @Inject constructor(
+        private val classifier: LeafDiseaseClassifier
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AnalysisViewModel::class.java)) {
-                return AnalysisViewModel(context.applicationContext) as T
+                return AnalysisViewModel(classifier) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

@@ -2,7 +2,6 @@ package com.leafdisease.ml
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.os.SystemClock
 import android.util.Log
 import com.google.ai.edge.litert.Accelerator
@@ -22,10 +21,9 @@ interface LeafDiseaseClassifier {
     /**
      * Classify a leaf disease from a bitmap image.
      * @param bitmap The input image bitmap
-     * @param rotationDegrees Rotation of the image (0, 90, 180, 270)
      * @return ClassificationResult with disease information
      */
-    fun classify(bitmap: Bitmap, rotationDegrees: Int = 0): ClassificationResult?
+    fun classify(bitmap: Bitmap): ClassificationResult?
 
     /**
      * Close the classifier and release resources.
@@ -83,12 +81,12 @@ class PlantDiseaseClassifier(
             )
         } catch (e: Exception) {
             close()
-            Log.e(TAG, "Failed to initialize classifier", e)
+            Log.e(TAG, " Failed to initialize classifier", e)
             throw e
         }
     }
 
-    override fun classify(bitmap: Bitmap, rotationDegrees: Int): ClassificationResult? {
+    override fun classify(bitmap: Bitmap): ClassificationResult? {
         val model = compiledModel ?: run {
             Log.e(TAG, "CompiledModel not initialized")
             return null
@@ -96,7 +94,7 @@ class PlantDiseaseClassifier(
 
         return try {
             val startTime = SystemClock.uptimeMillis()
-            val input = preprocessBitmap(bitmap, rotationDegrees)
+            val input = preprocessBitmap(bitmap)
 
             inputBuffers.firstOrNull()?.writeFloat(input)
                 ?: error("Input tensor buffer not available")
@@ -110,6 +108,10 @@ class PlantDiseaseClassifier(
             val maxIndex = probabilities.indices.maxByOrNull(probabilities::get) ?: return null
             val confidence = probabilities[maxIndex]
 
+            Log.i(TAG, "Raw output: ${rawOutput.contentToString()}")
+            Log.i(TAG, "Probabilities: ${probabilities.contentToString()}")
+            Log.i(TAG, "maxIndex $maxIndex")
+
             val inferenceTime = SystemClock.uptimeMillis() - startTime
             Log.d(TAG, "Inference completed in ${inferenceTime}ms")
 
@@ -122,6 +124,39 @@ class PlantDiseaseClassifier(
             Log.e(TAG, "Error during classification", e)
             null
         }
+    }
+
+    private fun preprocessBitmap(bitmap: Bitmap): FloatArray {
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, INPUT_SIZE, INPUT_SIZE, true)
+        val pixels = IntArray(INPUT_SIZE * INPUT_SIZE)
+        val input = FloatArray(INPUT_SIZE * INPUT_SIZE * NUM_CHANNELS)
+
+        resizedBitmap.getPixels(
+            pixels,
+            0,
+            INPUT_SIZE,
+            0,
+            0,
+            INPUT_SIZE,
+            INPUT_SIZE
+        )
+
+        var offset = 0
+        for (pixel in pixels) {
+            val red = (pixel shr 16) and 0xFF
+            val green = (pixel shr 8) and 0xFF
+            val blue = pixel and 0xFF
+
+            input[offset++] = (red - PIXEL_MEAN) / PIXEL_STD
+            input[offset++] = (green - PIXEL_MEAN) / PIXEL_STD
+            input[offset++] = (blue - PIXEL_MEAN) / PIXEL_STD
+        }
+
+        if (resizedBitmap !== bitmap && !resizedBitmap.isRecycled) {
+            resizedBitmap.recycle()
+        }
+
+        return input
     }
 
     private fun createModelOptions(environment: Environment): CompiledModel.Options {
@@ -147,44 +182,6 @@ class PlantDiseaseClassifier(
             Log.w(TAG, "Labels file not found, using PlantDiseaseInfo defaults", e)
             PlantDiseaseInfo.getAllDiseaseNames()
         }
-    }
-
-    private fun preprocessBitmap(bitmap: Bitmap, rotationDegrees: Int): FloatArray {
-        val rotatedBitmap = bitmap.rotate(rotationDegrees)
-        val resizedBitmap = Bitmap.createScaledBitmap(rotatedBitmap, INPUT_SIZE, INPUT_SIZE, true)
-        val pixels = IntArray(INPUT_SIZE * INPUT_SIZE)
-        val input = FloatArray(INPUT_SIZE * INPUT_SIZE * NUM_CHANNELS)
-
-        resizedBitmap.getPixels(
-            pixels,
-            0,
-            INPUT_SIZE,
-            0,
-            0,
-            INPUT_SIZE,
-            INPUT_SIZE
-        )
-
-        var offset = 0
-        for (pixel in pixels) {
-            val red = (pixel shr 16) and 0xFF
-            val green = (pixel shr 8) and 0xFF
-            val blue = pixel and 0xFF
-
-            // Mirrors tf.keras.applications.mobilenet_v2.preprocess_input from the training notebook.
-            input[offset++] = (red - PIXEL_MEAN) / PIXEL_STD
-            input[offset++] = (green - PIXEL_MEAN) / PIXEL_STD
-            input[offset++] = (blue - PIXEL_MEAN) / PIXEL_STD
-        }
-
-        if (rotatedBitmap !== bitmap && !rotatedBitmap.isRecycled) {
-            rotatedBitmap.recycle()
-        }
-        if (resizedBitmap !== rotatedBitmap && !resizedBitmap.isRecycled) {
-            resizedBitmap.recycle()
-        }
-
-        return input
     }
 
     private fun buildClassificationResult(
@@ -248,17 +245,5 @@ class PlantDiseaseClassifier(
 
         environment?.close()
         environment = null
-    }
-
-    private fun Bitmap.rotate(rotationDegrees: Int): Bitmap {
-        if (rotationDegrees % 360 == 0) {
-            return this
-        }
-
-        val matrix = Matrix().apply {
-            postRotate(rotationDegrees.toFloat())
-        }
-
-        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 }

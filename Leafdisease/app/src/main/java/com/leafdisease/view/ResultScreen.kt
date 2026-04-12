@@ -1,5 +1,7 @@
 package com.leafdisease.view
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,11 +24,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,14 +40,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.leafdisease.R
 import com.leafdisease.domain.model.ClassificationResult
-import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.domain.model.TreatmentStep
+import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
 import com.leafdisease.view.components.ScreenHeader
 
 @Composable
 fun ResultScreen(
+    imagePath: String?,
     onBackClick: () -> Unit = {},
     onScanAnotherClick: () -> Unit = {},
     result: ClassificationResult
@@ -58,13 +64,14 @@ fun ResultScreen(
         ScreenHeader(
             text = stringResource(R.string.result_screen_title),
             image = R.drawable.ic_round_arrow_left_24,
-            onIconClicked = {}
+            onIconClicked = { onBackClick.invoke() }
         )
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Plant Image Card
         PlantResultImage(
+            imagePath = imagePath,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
@@ -93,7 +100,7 @@ fun ResultScreen(
             result = result
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
 
         // Bottom Button
         CoreButton(
@@ -110,8 +117,11 @@ fun ResultScreen(
 
 @Composable
 fun PlantResultImage(
+    imagePath: String?,
     modifier: Modifier = Modifier
 ) {
+    val imageBitmap = rememberResultImageBitmap(imagePath)
+
     Card(
         modifier = modifier
             .height(LeafDiseaseTheme.dimensions.dimension200)
@@ -125,13 +135,21 @@ fun PlantResultImage(
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Plant Image
-            Icon(
-                painter = painterResource(R.drawable.ic_center_focus_strong_24),
-                contentDescription = "Plant Image",
-                modifier = Modifier.fillMaxSize(),
-                tint = LeafDiseaseTheme.colors.primary
-            )
+            if (imageBitmap != null) {
+                Image(
+                    bitmap = imageBitmap,
+                    contentDescription = "Plant Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    painter = painterResource(R.drawable.ic_center_focus_strong_24),
+                    contentDescription = "Plant Image",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = LeafDiseaseTheme.colors.primary
+                )
+            }
 
             // Label Badge
             Box(
@@ -149,6 +167,15 @@ fun PlantResultImage(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun rememberResultImageBitmap(imagePath: String?): ImageBitmap? {
+    return remember(imagePath) {
+        imagePath
+            ?.takeIf { it.isNotBlank() }
+            ?.let { path -> BitmapFactory.decodeFile(path)?.asImageBitmap() }
     }
 }
 
@@ -299,10 +326,10 @@ fun ActionItemsSection(
                 painter = painterResource(R.drawable.ic_leaf_24),
                 contentDescription = null,
                 tint = LeafDiseaseTheme.colors.primary,
-                modifier = Modifier.Companion.size(LeafDiseaseTheme.dimensions.dimension24)
+                modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension24)
             )
 
-            Spacer(modifier = Modifier.Companion.width(LeafDiseaseTheme.dimensions.dimension8))
+            Spacer(modifier = Modifier.width(LeafDiseaseTheme.dimensions.dimension8))
 
             Text(
                 text = stringResource(R.string.result_action_title),
@@ -313,16 +340,14 @@ fun ActionItemsSection(
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension16))
 
-        LazyColumn {
-            items(result.treatmentRecommendations.size) { index ->
-                val treatmentStep = result.treatmentRecommendations[index]
+        result.treatmentRecommendations.forEachIndexed { index, treatmentStep ->
+            ActionItem(
+                icon = R.drawable.ic_baseline_image_24,
+                title = "${treatmentStep.stepNumber}. ${treatmentStep.title}",
+                description = treatmentStep.description
+            )
 
-                ActionItem(
-                    icon = R.drawable.ic_baseline_image_24,
-                    title = "${treatmentStep.stepNumber}. ${treatmentStep.title}",
-                    description = treatmentStep.description
-                )
-
+            if (index < result.treatmentRecommendations.size - 1) {
                 Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
             }
         }
@@ -468,6 +493,7 @@ fun ResultScreenPreview() {
 
     LeafDiseaseTheme {
         ResultScreen(
+            imagePath = "",
             result = mockResult,
             onBackClick = {},
             onScanAnotherClick = {}

@@ -1,6 +1,7 @@
 package com.leafdisease.view
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider
 import com.leafdisease.R
+import com.leafdisease.ml.LeafDiseaseClassifier
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
@@ -45,21 +48,25 @@ import com.leafdisease.viewmodel.AnalysisState
 import com.leafdisease.viewmodel.AnalysisViewModel
 import java.io.File
 
+const val TAG = "AnalyzingScreen"
+
 @Composable
 fun AnalyzingScreen(
     imagePath: String,
-    imageRotation: Int = 0,
+    viewModelFactory: ViewModelProvider.Factory,
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     onAnalysisComplete: (Boolean, ClassificationResult?) -> Unit = { _, _ -> },
-    viewModel: AnalysisViewModel = viewModel(factory = AnalysisViewModel.Factory(androidx.compose.ui.platform.LocalContext.current))
+    viewModel: AnalysisViewModel = viewModel(factory = viewModelFactory)
 ) {
     val analysisState by viewModel.analysisState.collectAsState()
 
     // Initialize and start analysis
     LaunchedEffect(imagePath) {
+        Log.i(TAG, "image path: $imagePath")
+        viewModel.reset()
         viewModel.initializeClassifier()
-        viewModel.analyzeImage(imagePath, imageRotation)
+        viewModel.analyzeImage(imagePath)
     }
 
     // Handle state changes
@@ -407,6 +414,12 @@ fun AnalyzingScreenPreview() {
     LeafDiseaseTheme {
         AnalyzingScreen(
             imagePath = "",
+            viewModelFactory = AnalysisViewModel.Factory(
+                object : LeafDiseaseClassifier {
+                    override fun classify(bitmap: android.graphics.Bitmap): ClassificationResult? = null
+                    override fun close() = Unit
+                }
+            ),
             onCancelClick = {},
             onBackClick = {}
         )

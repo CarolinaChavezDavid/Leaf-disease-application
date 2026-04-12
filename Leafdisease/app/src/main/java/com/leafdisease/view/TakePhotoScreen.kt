@@ -2,7 +2,6 @@ package com.leafdisease.view
 
 import android.content.Context
 import android.util.Log
-import android.view.Surface
 import android.view.ViewTreeObserver
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -49,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -65,7 +65,7 @@ import androidx.camera.core.Preview as CameraPreview
 @Composable
 fun TakePhotoScreen(
     onBackClick: () -> Unit = {},
-    onPhotoTaken: (String, Int) -> Unit = { _, _ -> },  // Pass path AND rotation
+    onPhotoTaken: (String) -> Unit = {},  // Pass path AND rotation
     onGalleryClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -230,15 +230,13 @@ fun TakePhotoScreen(
                 onClick = {
                     if (!isCapturing && imageCapture != null) {
                         isCapturing = true
-                        val rotation = surfaceRotationToDegrees(imageCapture?.targetRotation ?: Surface.ROTATION_0)
                         takePhoto(
                             imageCapture = imageCapture!!,
                             context = context,
-                            rotation = rotation,
                             executor = cameraExecutor,
-                            onImageCaptured = { path, rot ->
+                            onImageCaptured = { path ->
                                 isCapturing = false
-                                onPhotoTaken(path, rot)
+                                onPhotoTaken(path)
                             },
                             onError = {
                                 isCapturing = false
@@ -380,9 +378,8 @@ private fun CameraBinder(
 private fun takePhoto(
     imageCapture: ImageCapture,
     context: Context,
-    rotation: Int,
     executor: ExecutorService,
-    onImageCaptured: (String, Int) -> Unit,
+    onImageCaptured: (String) -> Unit,
     onError: () -> Unit
 ) {
     // Create output directory
@@ -403,7 +400,7 @@ private fun takePhoto(
         executor,
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                onImageCaptured(photoFile.absolutePath, rotation)
+                onImageCaptured(photoFile.absolutePath)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -412,15 +409,6 @@ private fun takePhoto(
             }
         }
     )
-}
-
-private fun surfaceRotationToDegrees(rotation: Int): Int {
-    return when (rotation) {
-        Surface.ROTATION_90 -> 90
-        Surface.ROTATION_180 -> 180
-        Surface.ROTATION_270 -> 270
-        else -> 0
-    }
 }
 
 /**
@@ -511,7 +499,7 @@ private fun DrawScope.drawScannerOverlay(cornerColor: Color) {
     )
 }
 
-@androidx.compose.ui.tooling.preview.Preview
+@Preview
 @Composable
 fun TakePhotoScreenPreview() {
     LeafDiseaseTheme {

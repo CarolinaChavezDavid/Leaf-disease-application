@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -72,6 +73,8 @@ dependencies {
 
     // Tensorflow lite
     implementation(libs.litert)
+    implementation(libs.dagger)
+    add("ksp", libs.dagger.compiler)
 
     // Testing
     testImplementation(libs.junit)

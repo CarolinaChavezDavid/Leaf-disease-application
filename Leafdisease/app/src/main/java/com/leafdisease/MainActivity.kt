@@ -1,8 +1,10 @@
 package com.leafdisease
 
 import android.Manifest
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,13 +31,19 @@ import com.leafdisease.view.AnalyzingScreen
 import com.leafdisease.view.HomeScreen
 import com.leafdisease.view.TakePhotoScreen
 import com.leafdisease.view.ResultScreen
+import com.leafdisease.viewmodel.AnalysisViewModel
+import java.io.File
+
+const val TAG = "MainActivity"
 
 class MainActivity : ComponentActivity() {
 
     private var currentScreen by mutableStateOf(Screen.HOME)
     private var capturedImagePath by mutableStateOf<String?>(null)
-    private var capturedImageRotation by mutableStateOf(0)
     private var classificationResult by mutableStateOf<ClassificationResult?>(null)
+    private val analysisViewModelFactory: AnalysisViewModel.Factory by lazy {
+        (application as LeafDiseaseApplication).appComponent.analysisViewModelFactory()
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -45,6 +53,21 @@ class MainActivity : ComponentActivity() {
         } else {
             // Permission denied, stay on home screen
         }
+    }
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri ?: return@registerForActivityResult
+
+        val cachedImagePath = copyImageToCache(uri) ?: run {
+            Log.e(TAG, "Failed to import gallery image: $uri")
+            return@registerForActivityResult
+        }
+
+        Log.i(TAG, "Gallery image selected: $cachedImagePath")
+        capturedImagePath = cachedImagePath
+        navigateTo(Screen.ANALYZING)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,24 +80,27 @@ class MainActivity : ComponentActivity() {
                     AppNavigation(
                         currentScreen = currentScreen,
                         capturedImagePath = capturedImagePath,
-                        capturedImageRotation = capturedImageRotation,
                         classificationResult = classificationResult,
+                        analysisViewModelFactory = analysisViewModelFactory,
+                        onUploadImage = { pickImageLauncher.launch("image/*") },
                         onNavigate = { screen ->
                             when (screen) {
                                 Screen.TAKE_PHOTO -> checkCameraPermissionAndNavigate()
                                 else -> navigateTo(screen)
                             }
                         },
-                        onImageCaptured = { path, rotation ->
+                        onImageCaptured = { path ->
+                            Log.i(TAG, "Image captured: $path")
                             capturedImagePath = path
-                            capturedImageRotation = rotation
                             navigateTo(Screen.ANALYZING)
                         },
                         onAnalysisComplete = { result ->
                             classificationResult = result
                             navigateTo(Screen.RESULT)
                         },
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
                     )
                 }
             }
@@ -115,10 +141,11 @@ enum class Screen {
 fun AppNavigation(
     currentScreen: Screen,
     capturedImagePath: String?,
-    capturedImageRotation: Int,
     classificationResult: ClassificationResult?,
+    analysisViewModelFactory: AnalysisViewModel.Factory,
+    onUploadImage: () -> Unit,
     onNavigate: (Screen) -> Unit,
-    onImageCaptured: (String, Int) -> Unit,
+    onImageCaptured: (String) -> Unit,
     onAnalysisComplete: (ClassificationResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -139,7 +166,7 @@ fun AppNavigation(
         when (screen) {
             Screen.HOME -> HomeScreen(
                 onTakePhoto = { onNavigate(Screen.TAKE_PHOTO) },
-                onUploadImage = { /* Handle gallery upload */ }
+                onUploadImage = onUploadImage
             )
             Screen.TAKE_PHOTO -> TakePhotoScreen(
                 onBackClick = { onNavigate(Screen.HOME) },
@@ -148,7 +175,7 @@ fun AppNavigation(
             )
             Screen.ANALYZING -> AnalyzingScreen(
                 imagePath = capturedImagePath ?: "",
-                imageRotation = capturedImageRotation,
+                viewModelFactory = analysisViewModelFactory,
                 onCancelClick = { onNavigate(Screen.HOME) },
                 onBackClick = { onNavigate(Screen.TAKE_PHOTO) },
                 onAnalysisComplete = { success, result ->
@@ -158,12 +185,41 @@ fun AppNavigation(
                 }
             )
             Screen.RESULT -> ResultScreen(
+                imagePath = capturedImagePath,
                 result = classificationResult ?: createMockResult(),
                 onBackClick = { onNavigate(Screen.HOME) },
                 onScanAnotherClick = { onNavigate(Screen.HOME) }
             )
         }
     }
+}
+
+private fun MainActivity.copyImageToCache(uri: Uri): String? {
+    return runCatching {
+        val outputDirectory = File(cacheDir, "gallery_images").apply {
+            if (!exists()) mkdirs()
+        }
+
+        val mimeType = contentResolver.getType(uri).orEmpty()
+        val extension = when {
+            "png" in mimeType -> "png"
+            "webp" in mimeType -> "webp"
+            else -> "jpg"
+        }
+
+        val outputFile = File(
+            outputDirectory,
+            "IMG_${System.currentTimeMillis()}.$extension"
+        )
+
+        contentResolver.openInputStream(uri)?.use { input ->
+            outputFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        } ?: return null
+
+        outputFile.absolutePath
+    }.getOrNull()
 }
 
 // Fallback mock result for preview/error cases
