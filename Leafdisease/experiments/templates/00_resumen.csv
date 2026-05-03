@@ -1,0 +1,2 @@
+modelo,version,dataset,accuracy,precision_macro,recall_macro,f1_macro,tiempo_promedio_ms,p95_ms,memoria_mb,bateria_delta_pct,conclusion
+

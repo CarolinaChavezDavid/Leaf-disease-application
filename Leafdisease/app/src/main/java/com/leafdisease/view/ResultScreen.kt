@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.leafdisease.R
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.TreatmentStep
+import com.leafdisease.ui.format.toPercentageString
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
@@ -72,6 +73,7 @@ fun ResultScreen(
         // Plant Image Card
         PlantResultImage(
             imagePath = imagePath,
+            result = result,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
@@ -83,13 +85,6 @@ fun ResultScreen(
         DiagnosisSection(
             modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
             result = result
-        )
-
-        Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
-
-        // Pathogen Tags
-        PathogenTags(
-            modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24)
         )
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension32))
@@ -118,6 +113,7 @@ fun ResultScreen(
 @Composable
 fun PlantResultImage(
     imagePath: String?,
+    result: ClassificationResult,
     modifier: Modifier = Modifier
 ) {
     val imageBitmap = rememberResultImageBitmap(imagePath)
@@ -161,7 +157,7 @@ fun PlantResultImage(
                     .padding(horizontal = LeafDiseaseTheme.dimensions.dimension8, vertical = LeafDiseaseTheme.dimensions.dimension4)
             ) {
                 Text(
-                    text = "Eupta lata Hey",
+                    text = result.plantType,
                     style = LeafDiseaseTheme.typography.labelSmall,
                     color = Color.White
                 )
@@ -208,21 +204,20 @@ fun DiagnosisSection(
                 color = LeafDiseaseTheme.colors.onBackground
             )
 
-            Spacer(modifier = Modifier.Companion.height(LeafDiseaseTheme.dimensions.dimension4))
+            Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension4))
 
             // Scientific Name
-            result.scientificName?.let {
-                Text(
-                    text = it,
-                    style = LeafDiseaseTheme.typography.bodyMedium,
-                    color = LeafDiseaseTheme.colors.onSurfaceVariant
-                )
-            }
+
+            Text(
+                text = result.scientificName ?: result.description,
+                style = LeafDiseaseTheme.typography.bodyMedium,
+                color = LeafDiseaseTheme.colors.onSurfaceVariant
+            )
         }
 
         // Confidence Indicator
         ConfidenceIndicator(
-            confidence = 94,
+            result = result,
             modifier = Modifier.padding(start = LeafDiseaseTheme.dimensions.dimension16)
         )
     }
@@ -230,7 +225,7 @@ fun DiagnosisSection(
 
 @Composable
 fun ConfidenceIndicator(
-    confidence: Int,
+    result: ClassificationResult,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -238,18 +233,18 @@ fun ConfidenceIndicator(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension56),
+            modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension68),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                progress = { confidence / 100f },
+                progress = { result.confidence },
                 modifier = Modifier.fillMaxSize(),
                 color = LeafDiseaseTheme.colors.primary,
                 trackColor = LeafDiseaseTheme.colors.surfaceVariant,
                 strokeWidth = LeafDiseaseTheme.dimensions.dimension4
             )
             Text(
-                text = "$confidence%",
+                text = result.confidence.toPercentageString(),
                 style = LeafDiseaseTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 color = LeafDiseaseTheme.colors.primary
@@ -258,57 +253,14 @@ fun ConfidenceIndicator(
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension4))
 
-        Text(
-            text = stringResource(R.string.result_infected_status),
-            style = LeafDiseaseTheme.typography.labelSmall,
-            color = LeafDiseaseTheme.colors.error,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
-
-@Composable
-fun PathogenTags(
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(LeafDiseaseTheme.dimensions.dimension8)
-    ) {
-        // Pathogen Tag (Red/Danger)
-        TagChip(
-            text = stringResource(R.string.priority_high),
-            backgroundColor = LeafDiseaseTheme.colors.errorContainer,
-            textColor = LeafDiseaseTheme.colors.error
-        )
-
-        // Fungus Type Tag (Blue/Info)
-        TagChip(
-            text = stringResource(R.string.priority_low),
-            backgroundColor = LeafDiseaseTheme.colors.primaryContainer,
-            textColor = LeafDiseaseTheme.colors.primary
-        )
-    }
-}
-
-@Composable
-fun TagChip(
-    text: String,
-    backgroundColor: Color,
-    textColor: Color
-) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(LeafDiseaseTheme.dimensions.dimension20))
-            .background(backgroundColor)
-            .padding(horizontal = LeafDiseaseTheme.dimensions.dimension12, vertical = LeafDiseaseTheme.dimensions.dimension6)
-    ) {
-        Text(
-            text = text,
-            style = LeafDiseaseTheme.typography.labelSmall,
-            color = textColor,
-            fontWeight = FontWeight.Medium
-        )
+        if (!result.isHealthy) {
+            Text(
+                text = stringResource(R.string.result_infected_status),
+                style = LeafDiseaseTheme.typography.labelSmall,
+                color = LeafDiseaseTheme.colors.primary,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 
@@ -488,7 +440,8 @@ fun ResultScreenPreview() {
                 priority = TreatmentStep.Priority.MEDIUM
             )
         ),
-        confidenceLevel = ClassificationResult.ConfidenceLevel.HIGH
+        confidenceLevel = ClassificationResult.ConfidenceLevel.HIGH,
+        plantType = "Tomato"
     )
 
     LeafDiseaseTheme {

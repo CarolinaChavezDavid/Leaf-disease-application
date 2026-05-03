@@ -1,6 +1,8 @@
 package com.leafdisease.view
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.SystemClock
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,8 +24,13 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +56,7 @@ import com.leafdisease.viewmodel.AnalysisViewModel
 import java.io.File
 
 const val TAG = "AnalyzingScreen"
+private const val MINIMUM_LOADER_DURATION_MS = 5_000L
 
 @Composable
 fun AnalyzingScreen(
@@ -60,26 +68,103 @@ fun AnalyzingScreen(
     viewModel: AnalysisViewModel = viewModel(factory = viewModelFactory)
 ) {
     val analysisState by viewModel.analysisState.collectAsState()
+    var analysisStartedAt by remember(imagePath) {
+        mutableLongStateOf(0L)
+    }
+    var terminalState by remember(imagePath) {
+        mutableStateOf<AnalysisState?>(null)
+    }
 
     // Initialize and start analysis
     LaunchedEffect(imagePath) {
         Log.i(TAG, "image path: $imagePath")
         viewModel.reset()
-        viewModel.initializeClassifier()
-        viewModel.analyzeImage(imagePath)
+        terminalState = null
+        analysisStartedAt = SystemClock.elapsedRealtime()
+        viewModel.startAnalysis(imagePath)
     }
 
     // Handle state changes
-    LaunchedEffect(analysisState) {
-        when (val state = analysisState) {
-            is AnalysisState.Success -> {
-                // Navigate to result screen with the full classification result
-                onAnalysisComplete(true, state.result)
+    LaunchedEffect(analysisState, terminalState) {
+        when (analysisState) {
+            is AnalysisState.Success,
+            is AnalysisState.Error -> terminalState = analysisState
+            else -> if (terminalState != null) {
+                terminalState = null
             }
-            is AnalysisState.Error -> {
-                onAnalysisComplete(false, null)
+        }
+    }
+
+    val currentProgress by produceState(
+        initialValue = 0f,
+        key1 = analysisState,
+        key2 = terminalState,
+        key3 = analysisStartedAt
+    ) {
+        while (true) {
+            val elapsed = (SystemClock.elapsedRealtime() - analysisStartedAt).coerceAtLeast(0L)
+            val activeState = terminalState ?: analysisState
+
+            value = when (activeState) {
+                AnalysisState.Idle -> 0f
+                AnalysisState.LoadingModel -> progressFromElapsed(
+                    elapsed = elapsed,
+                    minValue = 0.02f,
+                    maxValue = 0.12f,
+                    durationMs = 1_000L
+                )
+                AnalysisState.Preprocessing -> progressFromElapsed(
+                    elapsed = elapsed,
+                    minValue = 0.12f,
+                    maxValue = 0.40f,
+                    durationMs = 2_000L
+                )
+                AnalysisState.Analyzing -> {
+                    if (elapsed <= MINIMUM_LOADER_DURATION_MS) {
+                        progressFromElapsed(
+                            elapsed = elapsed,
+                            minValue = 0.40f,
+                            maxValue = 0.90f,
+                            durationMs = MINIMUM_LOADER_DURATION_MS
+                        )
+                    } else {
+                        progressFromElapsed(
+                            elapsed = elapsed - MINIMUM_LOADER_DURATION_MS,
+                            minValue = 0.90f,
+                            maxValue = 0.98f,
+                            durationMs = 10_000L
+                        )
+                    }
+                }
+                is AnalysisState.Success,
+                is AnalysisState.Error -> {
+                    if (elapsed >= MINIMUM_LOADER_DURATION_MS) {
+                        1f
+                    } else {
+                        progressFromElapsed(
+                            elapsed = elapsed,
+                            minValue = 0.90f,
+                            maxValue = 1f,
+                            durationMs = MINIMUM_LOADER_DURATION_MS
+                        )
+                    }
+                }
+            }.coerceIn(0f, 1f)
+
+            if (terminalState != null && value >= 1f) {
+                break
             }
-            else -> { /* Continue showing progress */ }
+            kotlinx.coroutines.delay(16L)
+        }
+    }
+
+    LaunchedEffect(currentProgress, terminalState) {
+        if (currentProgress < 1f) return@LaunchedEffect
+
+        when (val state = terminalState) {
+            is AnalysisState.Success -> onAnalysisComplete(true, state.result)
+            is AnalysisState.Error -> onAnalysisComplete(false, null)
+            else -> Unit
         }
     }
 
@@ -135,9 +220,9 @@ fun AnalyzingScreen(
 
         // Dynamic Title based on state
         val titleText = when (analysisState) {
-            is AnalysisState.LoadingModel -> "Cargando modelo..."
-            is AnalysisState.Preprocessing -> "Preprocesando imagen..."
-            is AnalysisState.Analyzing -> stringResource(R.string.analyzing_title)
+            AnalysisState.LoadingModel -> "Cargando modelo..."
+            AnalysisState.Preprocessing -> "Preprocesando imagen..."
+            AnalysisState.Analyzing -> stringResource(R.string.analyzing_title)
             is AnalysisState.Success -> "Análisis completado"
             is AnalysisState.Error -> "Error en el análisis"
             else -> stringResource(R.string.analyzing_title)
@@ -154,9 +239,9 @@ fun AnalyzingScreen(
 
         // Dynamic Subtitle
         val subtitleText = when (analysisState) {
-            is AnalysisState.LoadingModel -> "Inicializando modelo MobileNetV2..."
-            is AnalysisState.Preprocessing -> "Optimizando imagen para análisis..."
-            is AnalysisState.Analyzing -> stringResource(R.string.analyzing_subtitle)
+            AnalysisState.LoadingModel -> "Inicializando modelo MobileNetV2..."
+            AnalysisState.Preprocessing -> "Optimizando imagen para análisis..."
+            AnalysisState.Analyzing -> stringResource(R.string.analyzing_subtitle)
             is AnalysisState.Success -> "Resultado listo para mostrar"
             is AnalysisState.Error -> (analysisState as AnalysisState.Error).message
             else -> stringResource(R.string.analyzing_subtitle)
@@ -173,18 +258,13 @@ fun AnalyzingScreen(
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension32))
 
         // Progress Section with dynamic progress
-        val (currentProgress, progressLabel) = when (val state = analysisState) {
-            is AnalysisState.Preprocessing -> {
-                val progress = state.progress / 100f
-                progress to "Preprocesando..."
-            }
-            is AnalysisState.Analyzing -> {
-                val progress = state.progress / 100f
-                progress to "Analizando..."
-            }
-            is AnalysisState.Success -> 1f to "Completo"
-            is AnalysisState.Error -> 0f to "Error"
-            else -> 0f to "Iniciando..."
+        val progressLabel = when (analysisState) {
+            AnalysisState.LoadingModel -> "Inicializando..."
+            AnalysisState.Preprocessing -> "Preprocesando..."
+            AnalysisState.Analyzing -> "Analizando..."
+            is AnalysisState.Success -> "Completo"
+            is AnalysisState.Error -> "Error"
+            else -> "Iniciando..."
         }
 
         ProgressSection(
@@ -225,6 +305,17 @@ fun AnalyzingScreen(
             )
         }
     }
+}
+
+private fun progressFromElapsed(
+    elapsed: Long,
+    minValue: Float,
+    maxValue: Float,
+    durationMs: Long
+): Float {
+    if (durationMs <= 0L) return maxValue
+    val normalized = (elapsed.toFloat() / durationMs).coerceIn(0f, 1f)
+    return minValue + ((maxValue - minValue) * normalized)
 }
 
 @Composable
@@ -416,7 +507,7 @@ fun AnalyzingScreenPreview() {
             imagePath = "",
             viewModelFactory = AnalysisViewModel.Factory(
                 object : LeafDiseaseClassifier {
-                    override fun classify(bitmap: android.graphics.Bitmap): ClassificationResult? = null
+                    override fun classify(bitmap: Bitmap): ClassificationResult? = null
                     override fun close() = Unit
                 }
             ),

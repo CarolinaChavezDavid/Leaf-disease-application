@@ -1,0 +1,2 @@
+run_id,modelo,sesion,device,acelerador,num_runs,init_ms,warmup_ms,avg_ms,median_ms,p95_ms,std_ms,mem_init_mb,mem_total_mb,battery_before,battery_after,delta_battery
+

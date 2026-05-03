@@ -231,6 +231,7 @@ private fun createMockResult(): ClassificationResult {
         isHealthy = true,
         description = "No analysis result available.",
         treatmentRecommendations = emptyList(),
-        confidenceLevel = ClassificationResult.ConfidenceLevel.LOW
+        confidenceLevel = ClassificationResult.ConfidenceLevel.LOW,
+        plantType = "Unknown"
     )
 }

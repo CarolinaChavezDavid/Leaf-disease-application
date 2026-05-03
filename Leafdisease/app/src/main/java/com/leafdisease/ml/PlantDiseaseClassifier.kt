@@ -110,7 +110,7 @@ class PlantDiseaseClassifier(
 
             Log.i(TAG, "Raw output: ${rawOutput.contentToString()}")
             Log.i(TAG, "Probabilities: ${probabilities.contentToString()}")
-            Log.i(TAG, "maxIndex $maxIndex")
+            Log.i(TAG, "maxIndex $maxIndex, confidence ${confidence * 100}")
 
             val inferenceTime = SystemClock.uptimeMillis() - startTime
             Log.d(TAG, "Inference completed in ${inferenceTime}ms")
@@ -168,6 +168,15 @@ class PlantDiseaseClassifier(
             add(Accelerator.CPU)
         }.toTypedArray()
 
+        Log.d(
+            TAG,
+            "Available accelerators=$availableAccelerators; selected order=${preferredAccelerators.contentToString()}"
+        )
+
+        if (!availableAccelerators.contains(Accelerator.GPU)) {
+            Log.d(TAG, "GPU accelerator not available on this device/runtime. Falling back to CPU.")
+        }
+
         return CompiledModel.Options(*preferredAccelerators)
     }
 
@@ -197,6 +206,7 @@ class PlantDiseaseClassifier(
                 isHealthy = diseaseInfo.isHealthy,
                 description = diseaseInfo.description,
                 treatmentRecommendations = diseaseInfo.treatmentSteps,
+                plantType = diseaseInfo.plantType,
                 confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
             )
         }
@@ -213,6 +223,7 @@ class PlantDiseaseClassifier(
             isHealthy = fallbackLabel.contains("healthy", ignoreCase = true),
             description = "Prediction generated from the LiteRT model.",
             treatmentRecommendations = emptyList(),
+            plantType = "Unknown",
             confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
         )
     }

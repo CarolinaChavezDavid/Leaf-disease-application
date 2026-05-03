@@ -2,6 +2,7 @@ package com.leafdisease.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.ml.LeafDiseaseClassifier
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,8 +25,8 @@ const val TAG = "AnalysisViewModel"
 sealed class AnalysisState {
     object Idle : AnalysisState()
     object LoadingModel : AnalysisState()
-    data class Preprocessing(val progress: Int) : AnalysisState()
-    data class Analyzing(val progress: Int) : AnalysisState()
+    object Preprocessing : AnalysisState()
+    object Analyzing : AnalysisState()
     data class Success(val result: ClassificationResult) : AnalysisState()
     data class Error(val message: String) : AnalysisState()
 }
@@ -45,12 +45,6 @@ class AnalysisViewModel(
     private var currentImagePath: String? = null
     private var isClassifierInitialized = false
 
-    companion object {
-        private const val PREPROCESS_STEPS = 30
-        private const val ANALYSIS_STEPS = 70
-        private const val STEP_DELAY_MS = 30L
-    }
-
     /**
      * Initialize the classifier. Should be called when the screen is created.
      */
@@ -60,15 +54,7 @@ class AnalysisViewModel(
                 if (isClassifierInitialized) return@launch
 
                 _analysisState.value = AnalysisState.LoadingModel
-
-                // Simulate model loading steps
-                for (i in 0..PREPROCESS_STEPS) {
-                    _analysisState.value = AnalysisState.Preprocessing(i)
-                    delay(STEP_DELAY_MS)
-                }
-
                 isClassifierInitialized = true
-
             } catch (e: Exception) {
                 _analysisState.value = AnalysisState.Error(
                     "Failed to load model: ${e.localizedMessage}"
@@ -77,21 +63,25 @@ class AnalysisViewModel(
         }
     }
 
-    /**
-     * Analyze an image file.
-     * @param imagePath Path to the captured/selected image
-     */
-    fun analyzeImage(imagePath: String) {
+    fun startAnalysis(imagePath: String) {
         currentImagePath = imagePath
 
         viewModelScope.launch {
             try {
-                _analysisState.value = AnalysisState.Preprocessing(0)
+                if (!isClassifierInitialized) {
+                    _analysisState.value = AnalysisState.LoadingModel
+                    isClassifierInitialized = true
+                }
 
-                // Load and preprocess image
+                _analysisState.value = AnalysisState.Preprocessing
+                val preprocessStart = SystemClock.elapsedRealtime()
+
                 val bitmap = withContext(Dispatchers.IO) {
                     loadAndPreprocessImage(imagePath)
                 }
+
+                val preprocessDuration = SystemClock.elapsedRealtime() - preprocessStart
+                Log.d(TAG, "Image preprocessing completed in ${preprocessDuration}ms")
 
                 if (bitmap == null) {
                     _analysisState.value = AnalysisState.Error("Failed to load image")
@@ -99,16 +89,15 @@ class AnalysisViewModel(
                     return@launch
                 }
 
-                // Simulate analysis steps with progress
-                for (i in 0..ANALYSIS_STEPS) {
-                    _analysisState.value = AnalysisState.Analyzing(PREPROCESS_STEPS + i)
-                    delay(STEP_DELAY_MS)
-                }
+                _analysisState.value = AnalysisState.Analyzing
+                val inferenceStart = SystemClock.elapsedRealtime()
 
-                // Perform actual inference with rotation
                 val result = withContext(Dispatchers.Default) {
                     classifier.classify(bitmap)
                 }
+
+                val inferenceDuration = SystemClock.elapsedRealtime() - inferenceStart
+                Log.d(TAG, "Image inference completed in ${inferenceDuration}ms")
 
                 if (result != null) {
                     _analysisState.value = AnalysisState.Success(result)
@@ -121,7 +110,6 @@ class AnalysisViewModel(
                     )
                 }
 
-                // Clean up bitmap
                 bitmap.recycle()
 
             } catch (e: Exception) {
@@ -130,6 +118,14 @@ class AnalysisViewModel(
                 )
             }
         }
+    }
+
+    /**
+     * Analyze an image file.
+     * @param imagePath Path to the captured/selected image
+     */
+    fun analyzeImage(imagePath: String) {
+        startAnalysis(imagePath)
     }
 
     /**

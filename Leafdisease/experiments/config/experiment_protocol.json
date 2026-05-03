@@ -1,0 +1,149 @@
+{
+  "version": "1.0.0",
+  "baseline_model": {
+    "name": "MobileNetV2",
+    "variant": "FP16",
+    "asset_path": "app/src/main/assets/mobilenetv2_v3_fp16.tflite",
+    "input_size": 224,
+    "normalization": "[-1,1]",
+    "confidence_threshold": 0.5,
+    "num_classes": 38
+  },
+  "datasets": {
+    "plant_village": {
+      "selection": "stratified_fixed_split",
+      "validation_per_class": 10,
+      "test_per_class": 30,
+      "labels": [
+        "Apple___Apple_scab",
+        "Apple___Black_rot",
+        "Apple___Cedar_apple_rust",
+        "Apple___healthy",
+        "Blueberry___healthy",
+        "Cherry___healthy",
+        "Cherry___Powdery_mildew",
+        "Corn___Cercospora_leaf_spot Gray_leaf_spot",
+        "Corn___Common_rust",
+        "Corn___healthy",
+        "Corn___Northern_Leaf_Blight",
+        "Grape___Black_rot",
+        "Grape___Esca_(Black_Measles)",
+        "Grape___healthy",
+        "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+        "Orange___Haunglongbing_(Citrus_greening)",
+        "Peach___Bacterial_spot",
+        "Peach___healthy",
+        "Pepper,_bell___Bacterial_spot",
+        "Pepper,_bell___healthy",
+        "Potato___Early_blight",
+        "Potato___healthy",
+        "Potato___Late_blight",
+        "Raspberry___healthy",
+        "Soybean___healthy",
+        "Squash___Powdery_mildew",
+        "Strawberry___healthy",
+        "Strawberry___Leaf_scorch",
+        "Tomato___Bacterial_spot",
+        "Tomato___Early_blight",
+        "Tomato___healthy",
+        "Tomato___Late_blight",
+        "Tomato___Leaf_Mold",
+        "Tomato___Septoria_leaf_spot",
+        "Tomato___Spider_mites Two-spotted_spider_mite",
+        "Tomato___Target_Spot",
+        "Tomato___Tomato_mosaic_virus",
+        "Tomato___Tomato_Yellow_Leaf_Curl_Virus"
+      ]
+    },
+    "demo": {
+      "classes": [
+        "Apple___Apple_scab",
+        "Corn___Common_rust",
+        "Potato___Late_blight",
+        "Grape___Black_rot",
+        "Tomato___Bacterial_spot",
+        "Tomato___healthy"
+      ],
+      "images_per_class": 2,
+      "difficulty_tags": [
+        "easy",
+        "moderate"
+      ]
+    },
+    "real_world": {
+      "total_images": 30,
+      "buckets": {
+        "simple_background_good_light": 10,
+        "complex_background_medium_light": 10,
+        "angled_shadow_or_blur": 10
+      }
+    },
+    "out_of_domain": {
+      "total_images": 15,
+      "buckets": {
+        "background_without_leaf": 5,
+        "distant_or_partial_leaf": 5,
+        "non_plant_object": 5
+      }
+    }
+  },
+  "metrics": {
+    "diagnostic": [
+      "accuracy",
+      "precision_macro",
+      "recall_macro",
+      "f1_macro",
+      "precision_weighted",
+      "recall_weighted",
+      "f1_weighted",
+      "confusion_matrix_38x38",
+      "f1_per_class",
+      "top1_error",
+      "classes_below_f1_0_90",
+      "most_confused_classes",
+      "avg_confidence_correct",
+      "avg_confidence_incorrect",
+      "rejected_below_threshold"
+    ],
+    "runtime": [
+      "init_ms",
+      "warmup_ms",
+      "avg_ms",
+      "median_ms",
+      "p95_ms",
+      "std_ms",
+      "mem_init_mb",
+      "mem_total_mb"
+    ],
+    "application": [
+      "cold_start_ms",
+      "end_to_end_ms",
+      "failure_rate",
+      "rejection_rate",
+      "battery_delta_pct",
+      "thermal_observation"
+    ],
+    "real_world": [
+      "confidence_distribution",
+      "confidence_below_0_5_pct",
+      "avg_inference_ms",
+      "capture_stability",
+      "visually_incoherent_predictions",
+      "out_of_domain_behavior"
+    ]
+  },
+  "inference_protocol": {
+    "sessions_per_model": 3,
+    "runs_per_session": 50,
+    "total_runs_per_model": 150
+  },
+  "sheets": [
+    "00_resumen",
+    "01_splits_imagenes",
+    "02_resultados_modelo",
+    "03_resultados_inferencia",
+    "04_real_world",
+    "05_out_of_domain"
+  ]
+}
+

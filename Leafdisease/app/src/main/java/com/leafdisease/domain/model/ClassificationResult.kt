@@ -10,6 +10,7 @@ data class ClassificationResult(
     val isHealthy: Boolean,
     val description: String,
     val treatmentRecommendations: List<TreatmentStep>,
+    val plantType: String,
     val confidenceLevel: ConfidenceLevel
 ) {
     enum class ConfidenceLevel {
