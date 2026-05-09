@@ -24,7 +24,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,8 +40,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.HorizontalDivider
 import com.leafdisease.R
+import com.leafdisease.domain.model.BenchmarkMetrics
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.TreatmentStep
 import com.leafdisease.ui.format.toPercentageString
@@ -52,7 +59,8 @@ fun ResultScreen(
     imagePath: String?,
     onBackClick: () -> Unit = {},
     onScanAnotherClick: () -> Unit = {},
-    result: ClassificationResult
+    result: ClassificationResult,
+    benchmarkMetrics: BenchmarkMetrics? = null,
 ) {
     Column(
         modifier = Modifier
@@ -96,6 +104,16 @@ fun ResultScreen(
         )
 
         Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension24))
+
+        // Sección de métricas de benchmark (solo en modo experimental)
+        if (benchmarkMetrics != null) {
+            Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension16))
+            BenchmarkMetricsSection(
+                modifier = Modifier.padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+                metrics  = benchmarkMetrics,
+            )
+            Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension16))
+        }
 
         // Bottom Button
         CoreButton(
@@ -363,6 +381,101 @@ fun ActionItem(
                 )
             }
         }
+    }
+}
+
+/**
+ * Sección colapsable de métricas de benchmark on-device.
+ *
+ * Muestra las métricas acumuladas del [BenchmarkClassifier] para la sesión actual:
+ *   - Modelo activo, Init time, Warmup, Avg/P95/Std, Memoria PSS, N muestras
+ *
+ * Estas métricas se registran manualmente en la hoja de cálculo del EXPERIMENTAL_PLAN.md
+ * después de completar las 50 inferencias de cada sesión.
+ */
+@Composable
+fun BenchmarkMetricsSection(
+    metrics: BenchmarkMetrics,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape    = RoundedCornerShape(LeafDiseaseTheme.dimensions.dimension12),
+        colors   = CardDefaults.cardColors(
+            containerColor = LeafDiseaseTheme.colors.surfaceVariant.copy(alpha = 0.6f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = LeafDiseaseTheme.dimensions.dimension2),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(LeafDiseaseTheme.dimensions.dimension16),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text       = "Métricas de benchmark",
+                    style      = LeafDiseaseTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color      = LeafDiseaseTheme.colors.onSurface,
+                )
+                Text(
+                    text  = if (expanded) "▲" else "▼",
+                    style = LeafDiseaseTheme.typography.labelSmall,
+                    color = LeafDiseaseTheme.colors.onSurfaceVariant,
+                )
+            }
+
+            Text(
+                text  = metrics.modelType.displayName,
+                style = LeafDiseaseTheme.typography.labelSmall,
+                color = LeafDiseaseTheme.colors.primary,
+                fontWeight = FontWeight.Medium,
+            )
+
+            if (expanded) {
+                Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
+
+                BenchmarkRow("Init time",       "${metrics.initTimeMs} ms")
+                BenchmarkRow("Warmup",          "${"%.1f".format(metrics.warmupMs)} ms")
+                BenchmarkRow("Avg (ms)",         "${"%.1f".format(metrics.avgMs)} ms")
+                BenchmarkRow("Mediana (P50)",   "${"%.1f".format(metrics.medianMs)} ms")
+                BenchmarkRow("P95 (ms)",        "${"%.1f".format(metrics.p95Ms)} ms")
+                BenchmarkRow("Std (ms)",        "${"%.1f".format(metrics.stdMs)} ms")
+                BenchmarkRow("Mem. PSS",        "${"%.1f".format(metrics.totalPssMb)} MB")
+                BenchmarkRow("Muestras",        "${metrics.sampleCount}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun BenchmarkRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text  = label,
+            style = LeafDiseaseTheme.typography.bodySmall,
+            color = LeafDiseaseTheme.colors.onSurfaceVariant,
+        )
+        Text(
+            text       = value,
+            style      = LeafDiseaseTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
+            color      = LeafDiseaseTheme.colors.onSurface,
+        )
     }
 }
 

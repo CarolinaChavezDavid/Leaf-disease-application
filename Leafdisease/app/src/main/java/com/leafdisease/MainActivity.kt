@@ -25,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import com.leafdisease.domain.model.BenchmarkMetrics
 import com.leafdisease.domain.model.ClassificationResult
+import com.leafdisease.domain.model.ModelType
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.AnalyzingScreen
 import com.leafdisease.view.HomeScreen
@@ -41,6 +43,8 @@ class MainActivity : ComponentActivity() {
     private var currentScreen by mutableStateOf(Screen.HOME)
     private var capturedImagePath by mutableStateOf<String?>(null)
     private var classificationResult by mutableStateOf<ClassificationResult?>(null)
+    private var benchmarkMetrics by mutableStateOf<BenchmarkMetrics?>(null)
+    private var selectedModel by mutableStateOf(ModelType.MOBILENET_V2)
     private val analysisViewModelFactory: AnalysisViewModel.Factory by lazy {
         (application as LeafDiseaseApplication).appComponent.analysisViewModelFactory()
     }
@@ -81,6 +85,8 @@ class MainActivity : ComponentActivity() {
                         currentScreen = currentScreen,
                         capturedImagePath = capturedImagePath,
                         classificationResult = classificationResult,
+                        benchmarkMetrics = benchmarkMetrics,
+                        selectedModel = selectedModel,
                         analysisViewModelFactory = analysisViewModelFactory,
                         onUploadImage = { pickImageLauncher.launch("image/*") },
                         onNavigate = { screen ->
@@ -94,9 +100,14 @@ class MainActivity : ComponentActivity() {
                             capturedImagePath = path
                             navigateTo(Screen.ANALYZING)
                         },
-                        onAnalysisComplete = { result ->
+                        onAnalysisComplete = { result, metrics ->
                             classificationResult = result
+                            benchmarkMetrics = metrics
                             navigateTo(Screen.RESULT)
+                        },
+                        onModelSelected = { model ->
+                            selectedModel = model
+                            Log.i(TAG, "Model selected: ${model.displayName}")
                         },
                         modifier = Modifier
                             .fillMaxSize()
@@ -142,11 +153,14 @@ fun AppNavigation(
     currentScreen: Screen,
     capturedImagePath: String?,
     classificationResult: ClassificationResult?,
+    benchmarkMetrics: BenchmarkMetrics?,
+    selectedModel: ModelType,
     analysisViewModelFactory: AnalysisViewModel.Factory,
     onUploadImage: () -> Unit,
     onNavigate: (Screen) -> Unit,
     onImageCaptured: (String) -> Unit,
-    onAnalysisComplete: (ClassificationResult) -> Unit,
+    onAnalysisComplete: (ClassificationResult, BenchmarkMetrics?) -> Unit,
+    onModelSelected: (ModelType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedContent(
@@ -165,29 +179,33 @@ fun AppNavigation(
     ) { screen ->
         when (screen) {
             Screen.HOME -> HomeScreen(
-                onTakePhoto = { onNavigate(Screen.TAKE_PHOTO) },
-                onUploadImage = onUploadImage
+                onTakePhoto      = { onNavigate(Screen.TAKE_PHOTO) },
+                onUploadImage    = onUploadImage,
+                selectedModel    = selectedModel,
+                onModelSelected  = onModelSelected,
             )
             Screen.TAKE_PHOTO -> TakePhotoScreen(
-                onBackClick = { onNavigate(Screen.HOME) },
-                onPhotoTaken = onImageCaptured,
+                onBackClick    = { onNavigate(Screen.HOME) },
+                onPhotoTaken   = onImageCaptured,
                 onGalleryClick = { /* Handle gallery click */ }
             )
             Screen.ANALYZING -> AnalyzingScreen(
-                imagePath = capturedImagePath ?: "",
+                imagePath        = capturedImagePath ?: "",
                 viewModelFactory = analysisViewModelFactory,
-                onCancelClick = { onNavigate(Screen.HOME) },
-                onBackClick = { onNavigate(Screen.TAKE_PHOTO) },
-                onAnalysisComplete = { success, result ->
+                selectedModel    = selectedModel,
+                onCancelClick    = { onNavigate(Screen.HOME) },
+                onBackClick      = { onNavigate(Screen.TAKE_PHOTO) },
+                onAnalysisComplete = { success, result, metrics ->
                     if (success && result != null) {
-                        onAnalysisComplete(result)
+                        onAnalysisComplete(result, metrics)
                     }
                 }
             )
             Screen.RESULT -> ResultScreen(
-                imagePath = capturedImagePath,
-                result = classificationResult ?: createMockResult(),
-                onBackClick = { onNavigate(Screen.HOME) },
+                imagePath        = capturedImagePath,
+                result           = classificationResult ?: createMockResult(),
+                benchmarkMetrics = benchmarkMetrics,
+                onBackClick      = { onNavigate(Screen.HOME) },
                 onScanAnotherClick = { onNavigate(Screen.HOME) }
             )
         }

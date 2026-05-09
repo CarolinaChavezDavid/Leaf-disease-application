@@ -45,7 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.ViewModelProvider
 import com.leafdisease.R
-import com.leafdisease.ml.LeafDiseaseClassifier
+import com.leafdisease.domain.model.BenchmarkMetrics
+import com.leafdisease.domain.model.ModelType
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
@@ -62,9 +63,10 @@ private const val MINIMUM_LOADER_DURATION_MS = 5_000L
 fun AnalyzingScreen(
     imagePath: String,
     viewModelFactory: ViewModelProvider.Factory,
+    selectedModel: ModelType = ModelType.MOBILENET_V2,
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
-    onAnalysisComplete: (Boolean, ClassificationResult?) -> Unit = { _, _ -> },
+    onAnalysisComplete: (Boolean, ClassificationResult?, BenchmarkMetrics?) -> Unit = { _, _, _ -> },
     viewModel: AnalysisViewModel = viewModel(factory = viewModelFactory)
 ) {
     val analysisState by viewModel.analysisState.collectAsState()
@@ -77,10 +79,11 @@ fun AnalyzingScreen(
 
     // Initialize and start analysis
     LaunchedEffect(imagePath) {
-        Log.i(TAG, "image path: $imagePath")
+        Log.i(TAG, "image path: $imagePath — model: ${selectedModel.displayName}")
         viewModel.reset()
         terminalState = null
         analysisStartedAt = SystemClock.elapsedRealtime()
+        viewModel.setModelType(selectedModel)
         viewModel.startAnalysis(imagePath)
     }
 
@@ -162,8 +165,8 @@ fun AnalyzingScreen(
         if (currentProgress < 1f) return@LaunchedEffect
 
         when (val state = terminalState) {
-            is AnalysisState.Success -> onAnalysisComplete(true, state.result)
-            is AnalysisState.Error -> onAnalysisComplete(false, null)
+            is AnalysisState.Success -> onAnalysisComplete(true, state.result, state.metrics)
+            is AnalysisState.Error   -> onAnalysisComplete(false, null, null)
             else -> Unit
         }
     }

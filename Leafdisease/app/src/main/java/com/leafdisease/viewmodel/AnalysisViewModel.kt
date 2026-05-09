@@ -7,8 +7,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.leafdisease.domain.model.BenchmarkMetrics
 import com.leafdisease.domain.model.ClassificationResult
-import com.leafdisease.ml.LeafDiseaseClassifier
+import com.leafdisease.domain.model.ModelType
+import com.leafdisease.ml.ClassifierFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,40 +21,58 @@ import java.io.File
 import javax.inject.Inject
 
 const val TAG = "AnalysisViewModel"
+
 /**
- * States for the analysis process.
+ * Estados para el flujo de análisis.
  */
 sealed class AnalysisState {
     object Idle : AnalysisState()
     object LoadingModel : AnalysisState()
     object Preprocessing : AnalysisState()
     object Analyzing : AnalysisState()
-    data class Success(val result: ClassificationResult) : AnalysisState()
+    data class Success(
+        val result: ClassificationResult,
+        /** Métricas acumuladas hasta esta inferencia. Null si el clasificador no es BenchmarkClassifier. */
+        val metrics: BenchmarkMetrics? = null,
+    ) : AnalysisState()
     data class Error(val message: String) : AnalysisState()
 }
 
 /**
- * ViewModel that manages the leaf disease analysis workflow.
- * Handles model loading, image preprocessing, and inference.
+ * ViewModel que gestiona el flujo de análisis de enfermedades en plantas.
+ *
+ * Cambios respecto al baseline:
+ *   - Recibe [ClassifierFactory] en lugar de [com.leafdisease.ml.LeafDiseaseClassifier]
+ *   - Expone [selectedModel] para que HomeScreen lo observe y cambie via [setModelType]
+ *   - [AnalysisState.Success] incluye [BenchmarkMetrics] con métricas de inferencia acumuladas
  */
 class AnalysisViewModel(
-    private val classifier: LeafDiseaseClassifier
+    private val classifierFactory: ClassifierFactory,
+    initialModelType: ModelType = ModelType.MOBILENET_V2,
 ) : ViewModel() {
 
     private val _analysisState = MutableStateFlow<AnalysisState>(AnalysisState.Idle)
     val analysisState: StateFlow<AnalysisState> = _analysisState.asStateFlow()
 
+    private val _selectedModel = MutableStateFlow(initialModelType)
+    val selectedModel: StateFlow<ModelType> = _selectedModel.asStateFlow()
+
     private var currentImagePath: String? = null
     private var isClassifierInitialized = false
 
     /**
-     * Initialize the classifier. Should be called when the screen is created.
+     * Cambia el modelo activo. Llámalo antes de [startAnalysis].
+     * El nuevo modelo se cargará (con medición de init time) en la primera inferencia.
      */
+    fun setModelType(modelType: ModelType) {
+        _selectedModel.value = modelType
+        Log.d(TAG, "Model type set to: ${modelType.displayName}")
+    }
+
     fun initializeClassifier() {
         viewModelScope.launch {
             try {
                 if (isClassifierInitialized) return@launch
-
                 _analysisState.value = AnalysisState.LoadingModel
                 isClassifierInitialized = true
             } catch (e: Exception) {
@@ -81,36 +101,35 @@ class AnalysisViewModel(
                 }
 
                 val preprocessDuration = SystemClock.elapsedRealtime() - preprocessStart
-                Log.d(TAG, "Image preprocessing completed in ${preprocessDuration}ms")
+                Log.d(TAG, "Preprocessing completed in ${preprocessDuration}ms")
 
                 if (bitmap == null) {
                     _analysisState.value = AnalysisState.Error("Failed to load image")
-                    Log.e(TAG, "Failed to load image")
                     return@launch
                 }
 
                 _analysisState.value = AnalysisState.Analyzing
-                val inferenceStart = SystemClock.elapsedRealtime()
 
-                val result = withContext(Dispatchers.Default) {
-                    classifier.classify(bitmap)
-                }
+                val activeModelType = _selectedModel.value
 
-                val inferenceDuration = SystemClock.elapsedRealtime() - inferenceStart
-                Log.d(TAG, "Image inference completed in ${inferenceDuration}ms")
-
-                if (result != null) {
-                    _analysisState.value = AnalysisState.Success(result)
-                    Log.i(TAG, "Analysis successful $result")
-                } else {
-                    Log.e(TAG, "Analysis Failed")
-
-                    _analysisState.value = AnalysisState.Error(
-                        "Could not classify the image. Please try again with a clearer photo."
-                    )
+                val (result, metrics) = withContext(Dispatchers.Default) {
+                    val classifier = classifierFactory.getOrCreate(activeModelType)
+                    val r = classifier.classify(bitmap)
+                    val m = classifier.getMetrics()
+                    Pair(r, m)
                 }
 
                 bitmap.recycle()
+
+                if (result != null) {
+                    _analysisState.value = AnalysisState.Success(result, metrics)
+                    Log.i(TAG, "Analysis successful [${activeModelType.displayName}] — " +
+                            "avg=${metrics.avgMs}ms P95=${metrics.p95Ms}ms samples=${metrics.sampleCount}")
+                } else {
+                    _analysisState.value = AnalysisState.Error(
+                        "No se pudo clasificar la imagen. Intenta con una foto más clara."
+                    )
+                }
 
             } catch (e: Exception) {
                 _analysisState.value = AnalysisState.Error(
@@ -120,60 +139,41 @@ class AnalysisViewModel(
         }
     }
 
-    /**
-     * Analyze an image file.
-     * @param imagePath Path to the captured/selected image
-     */
-    fun analyzeImage(imagePath: String) {
-        startAnalysis(imagePath)
-    }
+    fun analyzeImage(imagePath: String) = startAnalysis(imagePath)
 
-    /**
-     * Load and preprocess the image for inference.
-     */
     private fun loadAndPreprocessImage(imagePath: String): Bitmap? {
         return try {
             val file = File(imagePath)
             if (!file.exists()) return null
 
-            // Decode image bounds
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             BitmapFactory.decodeFile(imagePath, options)
 
-            // Calculate sample size to reduce memory usage
             val maxDimension = 1024
             val sampleSize = calculateInSampleSize(options, maxDimension, maxDimension)
 
-            // Decode with sample size
             val decodeOptions = BitmapFactory.Options().apply {
-                inSampleSize = sampleSize
+                inSampleSize      = sampleSize
                 inPreferredConfig = Bitmap.Config.ARGB_8888
             }
-
             BitmapFactory.decodeFile(imagePath, decodeOptions)
         } catch (e: Exception) {
             null
         }
     }
 
-    /**
-     * Calculate sample size for bitmap downsampling.
-     */
     private fun calculateInSampleSize(
         options: BitmapFactory.Options,
         reqWidth: Int,
         reqHeight: Int
     ): Int {
         val height = options.outHeight
-        val width = options.outWidth
+        val width  = options.outWidth
         var inSampleSize = 1
 
         if (height > reqHeight || width > reqWidth) {
             val halfHeight = height / 2
-            val halfWidth = width / 2
-
+            val halfWidth  = width / 2
             while ((halfHeight / inSampleSize) >= reqHeight &&
                 (halfWidth / inSampleSize) >= reqWidth
             ) {
@@ -183,41 +183,29 @@ class AnalysisViewModel(
         return inSampleSize
     }
 
-    /**
-     * Reset the analysis state to idle.
-     */
     fun reset() {
         _analysisState.value = AnalysisState.Idle
         currentImagePath = null
     }
 
-    /**
-     * Retry analysis with the current image.
-     */
     fun retry() {
-        currentImagePath?.let { path ->
-            analyzeImage(path)
-        } ?: run {
-            _analysisState.value = AnalysisState.Error("No image to analyze")
-        }
+        currentImagePath?.let { startAnalysis(it) }
+            ?: run { _analysisState.value = AnalysisState.Error("No image to analyze") }
     }
 
     override fun onCleared() {
         super.onCleared()
     }
 
-    /**
-     * Factory for creating AnalysisViewModel with context.
-     */
     class Factory @Inject constructor(
-        private val classifier: LeafDiseaseClassifier
+        private val classifierFactory: ClassifierFactory
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AnalysisViewModel::class.java)) {
-                return AnalysisViewModel(classifier) as T
+                return AnalysisViewModel(classifierFactory) as T
             }
-            throw IllegalArgumentException("Unknown ViewModel class")
+            throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
 }
