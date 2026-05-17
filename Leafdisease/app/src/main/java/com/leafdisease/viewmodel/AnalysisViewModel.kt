@@ -35,7 +35,7 @@ sealed class AnalysisState {
         /** Métricas acumuladas hasta esta inferencia. Null si el clasificador no es BenchmarkClassifier. */
         val metrics: BenchmarkMetrics? = null,
     ) : AnalysisState()
-    data class Error(val message: String) : AnalysisState()
+    data class Error(val message: String, val metrics: BenchmarkMetrics? = null) : AnalysisState()
 }
 
 /**
@@ -126,8 +126,11 @@ class AnalysisViewModel(
                     Log.i(TAG, "Analysis successful [${activeModelType.displayName}] — " +
                             "avg=${metrics.avgMs}ms P95=${metrics.p95Ms}ms samples=${metrics.sampleCount}")
                 } else {
+                    Log.i(TAG, "Low confidence [${activeModelType.displayName}] — " +
+                            "top=${metrics.topLabel} conf=${metrics.topConfidence}")
                     _analysisState.value = AnalysisState.Error(
-                        "No se pudo clasificar la imagen. Intenta con una foto más clara."
+                        "No se pudo clasificar la imagen. Intenta con una foto más clara.",
+                        metrics
                     )
                 }
 

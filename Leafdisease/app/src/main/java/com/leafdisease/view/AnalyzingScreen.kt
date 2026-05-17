@@ -166,7 +166,7 @@ fun AnalyzingScreen(
 
         when (val state = terminalState) {
             is AnalysisState.Success -> onAnalysisComplete(true, state.result, state.metrics)
-            is AnalysisState.Error   -> onAnalysisComplete(false, null, null)
+            is AnalysisState.Error   -> onAnalysisComplete(false, null, state.metrics)
             else -> Unit
         }
     }
@@ -292,6 +292,17 @@ fun AnalyzingScreen(
                     viewModel.reset()
                     onCancelClick()
                 }
+            )
+        }
+
+        // Benchmark metrics on error (confidence < threshold)
+        val errorMetrics = (terminalState as? AnalysisState.Error)?.metrics
+        if (errorMetrics != null) {
+            BenchmarkMetricsSection(
+                modifier = Modifier
+                    .padding(bottom = LeafDiseaseTheme.dimensions.dimension8)
+                    .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
+                metrics = errorMetrics,
             )
         }
 

@@ -43,4 +43,10 @@ data class BenchmarkMetrics(
 
     /** Número de inferencias steady-state que alimentan avg/P95/std (excluye warmup). */
     val sampleCount: Int,
+
+    /** Etiqueta (diseaseName) de la clase con mayor probabilidad en la última inferencia. */
+    val topLabel: String,
+
+    /** Confianza (0..1) de la clase con mayor probabilidad en la última inferencia. */
+    val topConfidence: Float,
 )

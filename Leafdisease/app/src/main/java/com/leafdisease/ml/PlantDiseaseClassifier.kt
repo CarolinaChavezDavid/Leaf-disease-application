@@ -115,10 +115,6 @@ class PlantDiseaseClassifier(
             val inferenceTime = SystemClock.uptimeMillis() - startTime
             Log.d(TAG, "Inference completed in ${inferenceTime}ms")
 
-            if (confidence < CONFIDENCE_THRESHOLD) {
-                return null
-            }
-
             buildClassificationResult(maxIndex, confidence)
         } catch (e: Exception) {
             Log.e(TAG, "Error during classification", e)

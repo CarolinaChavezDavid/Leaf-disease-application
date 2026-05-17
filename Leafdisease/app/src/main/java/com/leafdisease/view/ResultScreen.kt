@@ -444,9 +444,11 @@ fun BenchmarkMetricsSection(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
 
+                BenchmarkRow("Top label",        metrics.topLabel.ifEmpty { "—" })
+                BenchmarkRow("Top conf.",       "${"%.1f".format(metrics.topConfidence * 100)} %")
                 BenchmarkRow("Init time",       "${metrics.initTimeMs} ms")
                 BenchmarkRow("Warmup",          "${"%.1f".format(metrics.warmupMs)} ms")
-                BenchmarkRow("Avg (ms)",         "${"%.1f".format(metrics.avgMs)} ms")
+                BenchmarkRow("Avg (ms)",        "${"%.1f".format(metrics.avgMs)} ms")
                 BenchmarkRow("Mediana (P50)",   "${"%.1f".format(metrics.medianMs)} ms")
                 BenchmarkRow("P95 (ms)",        "${"%.1f".format(metrics.p95Ms)} ms")
                 BenchmarkRow("Std (ms)",        "${"%.1f".format(metrics.stdMs)} ms")
