@@ -29,10 +29,14 @@ class BenchmarkClassifier(
 
     companion object {
         private const val TAG = "BenchmarkClassifier"
+        private const val CONFIDENCE_THRESHOLD = 0.5f
     }
 
     private val timingsNs = mutableListOf<Long>()
     private var warmupNs  = 0L
+
+    private var lastTopLabel: String = ""
+    private var lastTopConfidence: Float = 0f
 
     override fun classify(bitmap: Bitmap): ClassificationResult? {
         val t0     = SystemClock.elapsedRealtimeNanos()
@@ -48,7 +52,13 @@ class BenchmarkClassifier(
             Log.d(TAG, "[${modelType.displayName}] inference[${timingsNs.size}]=${elapsed / 1_000_000}ms")
         }
 
-        return result
+        if (result == null) return null  // error real del modelo
+
+        lastTopLabel = result.diseaseName
+        lastTopConfidence = result.confidence
+        Log.d(TAG, "[${modelType.displayName}] top=${result.diseaseName} conf=${"%.2f".format(result.confidence)}")
+
+        return if (result.confidence < CONFIDENCE_THRESHOLD) null else result
     }
 
     /**
@@ -65,15 +75,17 @@ class BenchmarkClassifier(
         val totalPssMb = memInfo.totalPss / 1024.0
 
         return BenchmarkMetrics(
-            modelType   = modelType,
-            initTimeMs  = initTimeMs,
-            warmupMs    = if (warmupNs > 0L) warmupNs / 1_000_000.0 else 0.0,
-            avgMs       = if (ms.isNotEmpty()) ms.average()    else 0.0,
-            medianMs    = ms.median(),
-            p95Ms       = ms.percentile(95),
-            stdMs       = ms.std(),
-            totalPssMb  = totalPssMb,
-            sampleCount = ms.size,
+            modelType      = modelType,
+            initTimeMs     = initTimeMs,
+            warmupMs       = if (warmupNs > 0L) warmupNs / 1_000_000.0 else 0.0,
+            avgMs          = if (ms.isNotEmpty()) ms.average() else 0.0,
+            medianMs       = ms.median(),
+            p95Ms          = ms.percentile(95),
+            stdMs          = ms.std(),
+            totalPssMb     = totalPssMb,
+            sampleCount    = ms.size,
+            topLabel       = lastTopLabel,
+            topConfidence  = lastTopConfidence,
         )
     }
 
@@ -84,6 +96,8 @@ class BenchmarkClassifier(
     fun resetTimings() {
         timingsNs.clear()
         warmupNs = 0L
+        lastTopLabel = ""
+        lastTopConfidence = 0f
         Log.d(TAG, "[${modelType.displayName}] timings reset")
     }
 

@@ -101,8 +101,6 @@ class EfficientNetV2Classifier(
 
             Log.i(TAG, "Inference in ${SystemClock.uptimeMillis() - startTime}ms — class=$maxIndex conf=${confidence * 100}")
 
-            if (confidence < CONFIDENCE_THRESHOLD) return null
-
             buildClassificationResult(maxIndex, confidence)
         } catch (e: Exception) {
             Log.e(TAG, "Error during EfficientNetV2 classification", e)
