@@ -7,8 +7,8 @@ package com.leafdisease.domain.model
  * y su normalización de entrada requerida para inferencia correcta.
  *
  * IMPORTANTE — diferencias de preprocessing:
- *   MOBILENET_V2     → (pixel - 127.5f) / 127.5f  → rango [-1, 1]
- *   EFFICIENTNET_V2B0 → pixel / 255.0f             → rango [0, 1]
+ *   MOBILENET_V3_SMALL → (pixel - 127.5f) / 127.5f  → rango [-1, 1]
+ *   EFFICIENTNET_V2B0  → pixel / 255.0f             → rango [0, 1]
  *
  * Mezclar preprocessing y modelo produce predicciones silenciosamente incorrectas.
  */
@@ -18,9 +18,9 @@ enum class ModelType(
     val labelsPath: String = "labels.txt",
     val inputRange: String,
 ) {
-    MOBILENET_V2(
-        displayName = "MobileNetV2 FP16",
-        modelPath   = "mobilenetv2_v3_fp16.tflite",
+    MOBILENET_V3_SMALL(
+        displayName = "MobileNetV3 Small FP16",
+        modelPath   = "mobilenetv3_small_v1_fp16.tflite",
         inputRange  = "[-1, 1]",
     ),
     EFFICIENTNET_V2B0(

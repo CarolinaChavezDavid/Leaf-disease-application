@@ -2,6 +2,8 @@ package com.leafdisease.viewmodel
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import android.os.SystemClock
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -48,7 +50,7 @@ sealed class AnalysisState {
  */
 class AnalysisViewModel(
     private val classifierFactory: ClassifierFactory,
-    initialModelType: ModelType = ModelType.MOBILENET_V2,
+    initialModelType: ModelType = ModelType.MOBILENET_V3_SMALL,
 ) : ViewModel() {
 
     private val _analysisState = MutableStateFlow<AnalysisState>(AnalysisState.Idle)
@@ -149,20 +151,48 @@ class AnalysisViewModel(
             val file = File(imagePath)
             if (!file.exists()) return null
 
-            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            BitmapFactory.decodeFile(imagePath, options)
+            // Leer dimensiones sin cargar píxeles
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(imagePath, bounds)
 
-            val maxDimension = 1024
-            val sampleSize = calculateInSampleSize(options, maxDimension, maxDimension)
+            // Target 448px (2× el input del modelo 224px) para un único resize suave
+            // en preprocessBitmap(). inSampleSize solo potencias de 2 → 448 evita
+            // el doble downsampling agresivo que distorsionaba las predicciones.
+            val sampleSize = calculateInSampleSize(bounds, 448, 448)
 
-            val decodeOptions = BitmapFactory.Options().apply {
+            val bitmap = BitmapFactory.decodeFile(imagePath, BitmapFactory.Options().apply {
                 inSampleSize      = sampleSize
                 inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-            BitmapFactory.decodeFile(imagePath, decodeOptions)
+            }) ?: return null
+
+            // Corregir rotación EXIF — sin esto las fotos de cámara llegan rotadas
+            // al modelo y producen predicciones completamente incorrectas
+            correctExifRotation(bitmap, imagePath)
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to load image: $imagePath", e)
             null
         }
+    }
+
+    private fun correctExifRotation(bitmap: Bitmap, imagePath: String): Bitmap {
+        val rotation = try {
+            val exif = ExifInterface(imagePath)
+            when (exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                ExifInterface.ORIENTATION_ROTATE_90  -> 90f
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+                else                                 -> 0f
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not read EXIF orientation, assuming 0°", e)
+            0f
+        }
+
+        if (rotation == 0f) return bitmap
+
+        val matrix = Matrix().apply { postRotate(rotation) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            .also { if (it !== bitmap) bitmap.recycle() }
     }
 
     private fun calculateInSampleSize(

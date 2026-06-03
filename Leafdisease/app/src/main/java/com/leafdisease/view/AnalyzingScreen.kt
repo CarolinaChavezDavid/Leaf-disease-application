@@ -1,6 +1,5 @@
 package com.leafdisease.view
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.SystemClock
 import android.util.Log
@@ -24,13 +23,13 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,17 +40,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.leafdisease.R
 import com.leafdisease.domain.model.BenchmarkMetrics
+import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.ModelType
 import com.leafdisease.ui.theme.LeafDiseaseTheme
 import com.leafdisease.view.components.CoreButton
 import com.leafdisease.view.components.CoreButtonType
 import com.leafdisease.view.components.ScreenHeader
-import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.viewmodel.AnalysisState
 import com.leafdisease.viewmodel.AnalysisViewModel
 import java.io.File
@@ -63,7 +61,7 @@ private const val MINIMUM_LOADER_DURATION_MS = 5_000L
 fun AnalyzingScreen(
     imagePath: String,
     viewModelFactory: ViewModelProvider.Factory,
-    selectedModel: ModelType = ModelType.MOBILENET_V2,
+    selectedModel: ModelType = ModelType.MOBILENET_V3_SMALL,
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     onAnalysisComplete: (Boolean, ClassificationResult?, BenchmarkMetrics?) -> Unit = { _, _, _ -> },
@@ -223,11 +221,11 @@ fun AnalyzingScreen(
 
         // Dynamic Title based on state
         val titleText = when (analysisState) {
-            AnalysisState.LoadingModel -> "Cargando modelo..."
-            AnalysisState.Preprocessing -> "Preprocesando imagen..."
+            AnalysisState.LoadingModel -> stringResource(R.string.loading_model)
+            AnalysisState.Preprocessing -> stringResource(R.string.preprocessing_image)
             AnalysisState.Analyzing -> stringResource(R.string.analyzing_title)
-            is AnalysisState.Success -> "Análisis completado"
-            is AnalysisState.Error -> "Error en el análisis"
+            is AnalysisState.Success -> stringResource(R.string.analysis_complete)
+            is AnalysisState.Error -> stringResource(R.string.analysis_error)
             else -> stringResource(R.string.analyzing_title)
         }
 
@@ -242,10 +240,10 @@ fun AnalyzingScreen(
 
         // Dynamic Subtitle
         val subtitleText = when (analysisState) {
-            AnalysisState.LoadingModel -> "Inicializando modelo MobileNetV2..."
-            AnalysisState.Preprocessing -> "Optimizando imagen para análisis..."
+            AnalysisState.LoadingModel -> stringResource(R.string.initializing_model_state)
+            AnalysisState.Preprocessing -> stringResource(R.string.optimizing_image)
             AnalysisState.Analyzing -> stringResource(R.string.analyzing_subtitle)
-            is AnalysisState.Success -> "Resultado listo para mostrar"
+            is AnalysisState.Success -> stringResource(R.string.result_ready)
             is AnalysisState.Error -> (analysisState as AnalysisState.Error).message
             else -> stringResource(R.string.analyzing_subtitle)
         }
@@ -262,12 +260,12 @@ fun AnalyzingScreen(
 
         // Progress Section with dynamic progress
         val progressLabel = when (analysisState) {
-            AnalysisState.LoadingModel -> "Inicializando..."
-            AnalysisState.Preprocessing -> "Preprocesando..."
-            AnalysisState.Analyzing -> "Analizando..."
-            is AnalysisState.Success -> "Completo"
-            is AnalysisState.Error -> "Error"
-            else -> "Iniciando..."
+            AnalysisState.LoadingModel -> stringResource(R.string.status_initializing)
+            AnalysisState.Preprocessing -> stringResource(R.string.status_preprocessing)
+            AnalysisState.Analyzing -> stringResource(R.string.status_analyzing)
+            is AnalysisState.Success -> stringResource(R.string.status_complete)
+            is AnalysisState.Error -> stringResource(R.string.error)
+            else -> stringResource(R.string.status_starting)
         }
 
         ProgressSection(
@@ -312,7 +310,7 @@ fun AnalyzingScreen(
                 modifier = Modifier
                     .padding(bottom = LeafDiseaseTheme.dimensions.dimension16)
                     .padding(horizontal = LeafDiseaseTheme.dimensions.dimension24),
-                buttonText = "Reintentar",
+                buttonText = stringResource(R.string.retry),
                 buttonImage = R.drawable.ic_round_camera_alt_24,
                 buttonType = CoreButtonType.PRIMARY,
                 onClick = { viewModel.retry() }
@@ -361,14 +359,14 @@ fun PlantScanningImage(
         if (bitmap != null) {
             Image(
                 bitmap = bitmap,
-                contentDescription = "Plant being analyzed",
+                contentDescription = stringResource(R.string.plant_being_analyzed),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
         } else {
             Image(
                 painter = painterResource(R.drawable.plant_image_soy),
-                contentDescription = "Plant being analyzed",
+                contentDescription = stringResource(R.string.plant_being_analyzed),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -509,24 +507,6 @@ fun ProgressSection(
                 .clip(RoundedCornerShape(LeafDiseaseTheme.dimensions.dimension3)),
             color = LeafDiseaseTheme.colors.primary,
             trackColor = LeafDiseaseTheme.colors.surfaceVariant,
-        )
-    }
-}
-
-@Preview
-@Composable
-fun AnalyzingScreenPreview() {
-    LeafDiseaseTheme {
-        AnalyzingScreen(
-            imagePath = "",
-            viewModelFactory = AnalysisViewModel.Factory(
-                object : LeafDiseaseClassifier {
-                    override fun classify(bitmap: Bitmap): ClassificationResult? = null
-                    override fun close() = Unit
-                }
-            ),
-            onCancelClick = {},
-            onBackClick = {}
         )
     }
 }

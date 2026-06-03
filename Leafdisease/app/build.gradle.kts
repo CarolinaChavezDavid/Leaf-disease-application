@@ -65,6 +65,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.material3.adaptive.navigation3)
 
+    // ExifInterface
+    implementation(libs.androidx.exifinterface)
+
     // CameraX
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)

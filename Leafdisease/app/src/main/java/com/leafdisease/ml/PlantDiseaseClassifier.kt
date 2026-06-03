@@ -33,7 +33,7 @@ interface LeafDiseaseClassifier {
 
 /**
  * LiteRT implementation of the leaf disease classifier.
- * Uses a compiled MobileNetV2 FP16 model from the app assets.
+ * Uses a compiled MobileNetV3 Small FP16 model from the app assets.
  */
 class PlantDiseaseClassifier(
     private val context: Context,
@@ -41,7 +41,7 @@ class PlantDiseaseClassifier(
 
     companion object {
         private const val TAG = "PlantDiseaseClassifier"
-        private const val MODEL_PATH = "mobilenetv2_v3_fp16.tflite"
+        private const val MODEL_PATH = "mobilenetv3_small_v1_fp16.tflite"
         private const val LABELS_PATH = "labels.txt"
         private const val INPUT_SIZE = 224
         private const val NUM_CHANNELS = 3
@@ -148,6 +148,17 @@ class PlantDiseaseClassifier(
             input[offset++] = (blue - PIXEL_MEAN) / PIXEL_STD
         }
 
+        // === DIAGNÓSTICO — eliminar después de verificar ===
+        val rawFirst = pixels.take(2).map { p ->
+            Triple((p shr 16) and 0xFF, (p shr 8) and 0xFF, p and 0xFF)
+        }
+        Log.d(TAG, "DIAG raw pixels[0] R=${rawFirst[0].first} G=${rawFirst[0].second} B=${rawFirst[0].third}")
+        Log.d(TAG, "DIAG raw pixels[1] R=${rawFirst[1].first} G=${rawFirst[1].second} B=${rawFirst[1].third}")
+        Log.d(TAG, "DIAG input[0..5]=${input.take(6).map { "%.4f".format(it) }}")
+        Log.d(TAG, "DIAG input stats min=${"%.4f".format(input.min())} max=${"%.4f".format(input.max())} mean=${"%.4f".format(input.average())}")
+        Log.d(TAG, "DIAG bitmap size before resize=${bitmap.width}x${bitmap.height} after=224x224")
+        // === FIN DIAGNÓSTICO ===
+
         if (resizedBitmap !== bitmap && !resizedBitmap.isRecycled) {
             resizedBitmap.recycle()
         }
@@ -193,24 +204,15 @@ class PlantDiseaseClassifier(
         classIndex: Int,
         confidence: Float,
     ): ClassificationResult {
-        val diseaseInfo = PlantDiseaseInfo.getDiseaseInfo(classIndex)
-        if (diseaseInfo != null) {
-            return ClassificationResult(
-                diseaseName = diseaseInfo.diseaseName,
-                scientificName = diseaseInfo.scientificName,
-                confidence = confidence,
-                isHealthy = diseaseInfo.isHealthy,
-                description = diseaseInfo.description,
-                treatmentRecommendations = diseaseInfo.treatmentSteps,
-                plantType = diseaseInfo.plantType,
-                confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
-            )
-        }
+        val rawLabel = labels.getOrNull(classIndex) ?: ""
 
-        val fallbackLabel = labels.getOrNull(classIndex)
-            ?.replace("___", " - ")
-            ?.replace('_', ' ')
-            ?: "Unknown disease"
+        PlantDiseaseInfo.getClassificationResult(classIndex, confidence, rawLabel, context)
+            ?.let { return it }
+
+        val fallbackLabel = rawLabel
+            .replace("___", " - ")
+            .replace('_', ' ')
+            .ifEmpty { "Unknown disease" }
 
         return ClassificationResult(
             diseaseName = fallbackLabel,
@@ -220,7 +222,8 @@ class PlantDiseaseClassifier(
             description = "Prediction generated from the LiteRT model.",
             treatmentRecommendations = emptyList(),
             plantType = "Unknown",
-            confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence)
+            confidenceLevel = PlantDiseaseInfo.getConfidenceLevel(confidence),
+            rawLabel = rawLabel,
         )
     }
 

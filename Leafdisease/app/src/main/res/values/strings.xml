@@ -3,144 +3,241 @@
     <string name="app_name">Leaf Scan</string>
 
     <!-- Common / General -->
-    <string name="back">Back</string>
-    <string name="cancel">Cancel</string>
-    <string name="retry">Retry</string>
-    <string name="continue_button">Continue</string>
-    <string name="close">Close</string>
-    <string name="save">Save</string>
-    <string name="share">Share</string>
-    <string name="delete">Delete</string>
-    <string name="loading">Loading...</string>
+    <string name="back">Atrás</string>
+    <string name="cancel">Cancelar</string>
+    <string name="retry">Reintentar</string>
+    <string name="continue_button">Continuar</string>
+    <string name="close">Cerrar</string>
+    <string name="save">Guardar</string>
+    <string name="share">Compartir</string>
+    <string name="delete">Eliminar</string>
+    <string name="loading">Cargando...</string>
     <string name="error">Error</string>
-    <string name="success">Success</string>
-    <string name="high">High</string>
-    <string name="medium">Medium</string>
-    <string name="low">Low</string>
+    <string name="success">Éxito</string>
+    <string name="high">Alto</string>
+    <string name="medium">Medio</string>
+    <string name="low">Bajo</string>
 
     <!-- Confidence Levels -->
-    <string name="confidence_high">High Confidence</string>
-    <string name="confidence_medium">Medium Confidence</string>
-    <string name="confidence_low">Low Confidence</string>
+    <string name="confidence_high">Alta Confianza</string>
+    <string name="confidence_medium">Confianza Media</string>
+    <string name="confidence_low">Baja Confianza</string>
 
     <!-- Priority Levels -->
-    <string name="priority_high">High Priority</string>
-    <string name="priority_medium">Medium Priority</string>
-    <string name="priority_low">Low Priority</string>
+    <string name="priority_high">Alta Prioridad</string>
+    <string name="priority_medium">Prioridad Media</string>
+    <string name="priority_low">Baja Prioridad</string>
 
     <!-- Home screen -->
-    <string name="home_screen_header">Healthy crops start here</string>
-    <string name="home_screen_description">Analyze crop leaves with artificial intelligence models</string>
-    <string name="home_screen_image_content">AI Diagnosis</string>
-    <string name="home_screen_take_photo_button">Take Photo</string>
-    <string name="home_screen_upload_image_button">Upload from Gallery</string>
+    <string name="home_screen_header">Los cultivos sanos empiezan aquí</string>
+    <string name="home_screen_description">Analiza las hojas de cultivos con modelos de inteligencia artificial</string>
+    <string name="home_screen_image_content">Diagnóstico por IA</string>
+    <string name="home_screen_take_photo_button">Tomar Foto</string>
+    <string name="home_screen_upload_image_button">Subir desde Galería</string>
 
     <!-- Take Photo screen -->
-    <string name="take_photo_title">Capture Image</string>
-    <string name="take_photo_instructions">Center the plant leaf in the focus area for better analysis</string>
-    <string name="focus_area_description">Focus area</string>
-    <string name="focus_instruction">Focus leaf here</string>
-    <string name="take_photo_button">Take photo</string>
-    <string name="open_gallery">Open gallery</string>
+    <string name="take_photo_title">Capturar Imagen</string>
+    <string name="take_photo_instructions">Centra la hoja de la planta en el área de enfoque para un mejor análisis</string>
+    <string name="focus_area_description">Área de enfoque</string>
+    <string name="focus_instruction">Enfoca la hoja aquí</string>
+    <string name="take_photo_button">Tomar foto</string>
+    <string name="open_gallery">Abrir galería</string>
 
     <!-- Analyzing screen -->
-    <string name="analyzing_screen_title">Plant Analysis</string>
-    <string name="analyzing_title">Analyzing your plant...</string>
-    <string name="analyzing_subtitle">Our AI is identifying possible problems and health indicators.</string>
-    <string name="analyzing_step_species">IDENTIFYING SPECIES</string>
-    <string name="analyzing_pattern_search">Searching for fungal patterns...</string>
-    <string name="analyzing_cancel_button">Cancel Analysis</string>
-    <string name="analyzing_footer">POWERED BY FLORAAI VISION V4.2</string>
-    <string name="loading_model">Loading model...</string>
-    <string name="preprocessing_image">Preprocessing image...</string>
-    <string name="analysis_complete">Analysis complete</string>
-    <string name="analysis_error">Analysis error</string>
-    <string name="analysis_error_message">Could not classify the image. Please try again with a clearer photo.</string>
+    <string name="analyzing_screen_title">Análisis de la Planta</string>
+    <string name="analyzing_title">Analizando su planta...</string>
+    <string name="analyzing_subtitle">Nuestra IA está identificando posibles problemas e indicadores de salud.</string>
+    <string name="analyzing_step_species">IDENTIFICANDO ESPECIE</string>
+    <string name="analyzing_pattern_search">Buscando patrones de hongos...</string>
+    <string name="analyzing_cancel_button">Cancelar Análisis</string>
+    <string name="analyzing_footer">IMPULSADO POR FLORAAI VISION V4.2</string>
+    <string name="loading_model">Cargando modelo...</string>
+    <string name="preprocessing_image">Preprocesando imagen...</string>
+    <string name="analysis_complete">Análisis completado</string>
+    <string name="analysis_error">Error en el análisis</string>
+    <string name="analysis_error_message">No se pudo clasificar la imagen. Intente nuevamente con una foto más clara.</string>
 
     <!-- Result screen -->
-    <string name="result_screen_title">Diagnosis Results</string>
-    <string name="result_diagnosis_label">DIAGNOSIS</string>
-    <string name="result_infected_status">INFECTED</string>
-    <string name="result_healthy_status">HEALTHY</string>
-    <string name="result_action_title">What to do next</string>
-    <string name="result_encyclopedia_link">Complete Disease Encyclopedia</string>
-    <string name="result_scan_another_button">Scan Another Plant</string>
-    <string name="confidence_label">Confidence</string>
-    <string name="scientific_name_label">Scientific Name</string>
-    <string name="description_label">Description</string>
-    <string name="treatment_label">Treatment</string>
-    <string name="step_number">Step %d</string>
+    <string name="result_screen_title">Resultados del Diagnóstico</string>
+    <string name="result_diagnosis_label">DIAGNÓSTICO</string>
+    <string name="result_infected_status">INFECTADO</string>
+    <string name="result_healthy_status">SANO</string>
+    <string name="result_action_title">Qué hacer a continuación</string>
+    <string name="result_encyclopedia_link">Enciclopedia Completa de Enfermedades</string>
+    <string name="result_scan_another_button">Escanear otra Planta</string>
+    <string name="confidence_label">Confianza</string>
+    <string name="scientific_name_label">Nombre Científico</string>
+    <string name="description_label">Descripción</string>
+    <string name="treatment_label">Tratamiento</string>
+    <string name="step_number">Paso %d</string>
+
+    <!-- Model selector -->
+    <string name="active_model">Modelo activo</string>
+
+    <!-- Analysis states -->
+    <string name="initializing_model_state">Inicializando modelo...</string>
+    <string name="optimizing_image">Optimizando imagen para análisis...</string>
+    <string name="result_ready">Resultado listo para mostrar</string>
+    <string name="status_initializing">Inicializando...</string>
+    <string name="status_preprocessing">Preprocesando...</string>
+    <string name="status_analyzing">Analizando...</string>
+    <string name="status_complete">Completo</string>
+    <string name="status_starting">Iniciando...</string>
+
+    <!-- Content descriptions -->
+    <string name="plant_being_analyzed">Planta siendo analizada</string>
+    <string name="plant_image_content_desc">Imagen de la planta</string>
+    <string name="navigate_content_desc">Navegar</string>
+
+    <!-- Benchmark metrics -->
+    <string name="benchmark_metrics_title">Métricas de benchmark</string>
+    <string name="benchmark_top_label">Top label</string>
+    <string name="benchmark_top_conf">Top conf.</string>
+    <string name="benchmark_init_time">Tiempo de inicio</string>
+    <string name="benchmark_warmup">Calentamiento</string>
+    <string name="benchmark_inference">Inferencia</string>
+    <string name="benchmark_avg_ms">Prom. (ms)</string>
+    <string name="benchmark_median_p50">Mediana (P50)</string>
+    <string name="benchmark_p95_ms">P95 (ms)</string>
+    <string name="benchmark_std_ms">Desv. est. (ms)</string>
+    <string name="benchmark_mem_pss">Mem. PSS</string>
+
+    <!-- ==================== HEALTHY PLANT TREATMENT TITLES ==================== -->
+
+    <!-- Blueberry healthy -->
+    <string name="treatment_blueberry_1_title">Mantener pH del suelo</string>
+    <string name="treatment_blueberry_2_title">Acolchar regularmente</string>
+    <string name="treatment_blueberry_3_title">Podar tallos viejos</string>
+
+    <!-- Cherry healthy -->
+    <string name="treatment_cherry_1_title">Continuar cuidado</string>
+    <string name="treatment_cherry_2_title">Vigilar plagas</string>
+    <string name="treatment_cherry_3_title">Cosechar correctamente</string>
+
+    <!-- Corn healthy -->
+    <string name="treatment_corn_healthy_1_title">Mantener fertilidad</string>
+    <string name="treatment_corn_healthy_2_title">Riego</string>
+    <string name="treatment_corn_healthy_3_title">Control de malezas</string>
+    <string name="treatment_corn_healthy_1_desc">Asegure nitrógeno y potasio adecuados.</string>
+    <string name="treatment_corn_healthy_2_desc">Riegue durante las etapas críticas de crecimiento.</string>
+    <string name="treatment_corn_healthy_3_desc">Mantenga el campo libre de malezas durante el crecimiento temprano.</string>
+
+    <!-- Grape healthy -->
+    <string name="treatment_grape_healthy_1_title">Poda regular</string>
+    <string name="treatment_grape_healthy_2_title">Prevención de enfermedades</string>
+    <string name="treatment_grape_healthy_3_title">Gestión de nutrientes</string>
+    <string name="treatment_grape_healthy_1_desc">Mantenga un adecuado manejo del dosel.</string>
+    <string name="treatment_grape_healthy_2_desc">Aplique pulverizaciones fungicidas preventivas.</string>
+    <string name="treatment_grape_healthy_3_desc">Monitoree y mantenga la fertilidad adecuada del suelo.</string>
+
+    <!-- Peach healthy -->
+    <string name="treatment_peach_healthy_1_title">Poda anual</string>
+    <string name="treatment_peach_healthy_2_title">Aclarar frutos</string>
+    <string name="treatment_peach_healthy_3_title">Fertilizar adecuadamente</string>
+
+    <!-- Pepper healthy -->
+    <string name="treatment_pepper_healthy_1_title">Riego uniforme</string>
+    <string name="treatment_pepper_healthy_2_title">Fertilizar adecuadamente</string>
+    <string name="treatment_pepper_healthy_3_title">Soporte para plantas</string>
+
+    <!-- Potato healthy -->
+    <string name="treatment_potato_healthy_1_title">Aporcar regularmente</string>
+    <string name="treatment_potato_healthy_2_title">Vigilar plagas</string>
+    <string name="treatment_potato_healthy_3_title">Cosecha adecuada</string>
+    <string name="treatment_potato_healthy_1_desc">Acumule tierra alrededor de los tallos para proteger los tubérculos.</string>
+    <string name="treatment_potato_healthy_2_desc">Revise la presencia del escarabajo de la papa de Colorado.</string>
+    <string name="treatment_potato_healthy_3_desc">Coseche cuando los tallos se hayan secado.</string>
+
+    <!-- Raspberry healthy -->
+    <string name="treatment_raspberry_1_title">Podar anualmente</string>
+    <string name="treatment_raspberry_2_title">Soporte para tallos</string>
+    <string name="treatment_raspberry_3_title">Control de malezas</string>
+
+    <!-- Soybean healthy -->
+    <string name="treatment_soybean_1_title">Inocular semillas</string>
+    <string name="treatment_soybean_2_title">Rotar cultivos</string>
+    <string name="treatment_soybean_3_title">Gestión de malezas</string>
+
+    <!-- Strawberry healthy -->
+    <string name="treatment_strawberry_healthy_1_title">Renovar camas</string>
+    <string name="treatment_strawberry_healthy_2_title">Fertilizar</string>
+    <string name="treatment_strawberry_healthy_3_title">Protección invernal</string>
+
+    <!-- Tomato healthy -->
+    <string name="treatment_tomato_healthy_1_title">Cuidado regular</string>
+    <string name="treatment_tomato_healthy_2_title">Podar chupones</string>
+    <string name="treatment_tomato_healthy_3_title">Monitorear</string>
 
     <!-- ==================== DISEASE NAMES ==================== -->
 
     <!-- Apple Diseases -->
-    <string name="disease_apple_scab">Apple Scab</string>
-    <string name="disease_apple_black_rot">Apple Black Rot</string>
-    <string name="disease_cedar_apple_rust">Cedar Apple Rust</string>
-    <string name="disease_apple_healthy">Apple Healthy</string>
+    <string name="disease_apple_scab">Roya del Manzano</string>
+    <string name="disease_apple_black_rot">Podredumbre Negra del Manzano</string>
+    <string name="disease_cedar_apple_rust">Roya del Cedro y Manzano</string>
+    <string name="disease_apple_healthy">Manzano Saludable</string>
 
     <!-- Blueberry Diseases -->
-    <string name="disease_blueberry_healthy">Blueberry Healthy</string>
+    <string name="disease_blueberry_healthy">Arándano Saludable</string>
 
     <!-- Cherry Diseases -->
-    <string name="disease_cherry_powdery_mildew">Cherry Powdery Mildew</string>
-    <string name="disease_cherry_healthy">Cherry Healthy</string>
+    <string name="disease_cherry_powdery_mildew">Oidio de la Cereza</string>
+    <string name="disease_cherry_healthy">Cerezo Saludable</string>
 
     <!-- Corn Diseases -->
-    <string name="disease_corn_cercospora_leaf_spot">Corn Cercospora Leaf Spot</string>
-    <string name="disease_corn_common_rust">Corn Common Rust</string>
-    <string name="disease_corn_northern_leaf_blight">Corn Northern Leaf Blight</string>
-    <string name="disease_corn_healthy">Corn Healthy</string>
+    <string name="disease_corn_cercospora_leaf_spot">Mancha Cercospora del Maíz</string>
+    <string name="disease_corn_common_rust">Roya Común del Maíz</string>
+    <string name="disease_corn_northern_leaf_blight">Tizón del Norte del Maíz</string>
+    <string name="disease_corn_healthy">Maíz Saludable</string>
 
     <!-- Grape Diseases -->
-    <string name="disease_grape_black_rot">Grape Black Rot</string>
-    <string name="disease_grape_esca">Grape Esca (Black Measles)</string>
-    <string name="disease_grape_leaf_blight">Grape Leaf Blight</string>
-    <string name="disease_grape_healthy">Grape Healthy</string>
+    <string name="disease_grape_black_rot">Podredumbre Negra de la Uva</string>
+    <string name="disease_grape_esca">Esca de la Vid (Sarampión Negro)</string>
+    <string name="disease_grape_leaf_blight">Tizón de la Hoja de la Uva</string>
+    <string name="disease_grape_healthy">Vid Saludable</string>
 
     <!-- Orange Diseases -->
-    <string name="disease_citrus_greening">Citrus Greening (Huanglongbing)</string>
+    <string name="disease_citrus_greening">Enverdecimiento de los Cítricos (Huanglongbing)</string>
 
     <!-- Peach Diseases -->
-    <string name="disease_peach_bacterial_spot">Peach Bacterial Spot</string>
-    <string name="disease_peach_healthy">Peach Healthy</string>
+    <string name="disease_peach_bacterial_spot">Mancha Bacteriana del Durazno</string>
+    <string name="disease_peach_healthy">Durazno Saludable</string>
 
     <!-- Pepper Diseases -->
-    <string name="disease_pepper_bacterial_spot">Pepper Bacterial Spot</string>
-    <string name="disease_pepper_healthy">Pepper Healthy</string>
+    <string name="disease_pepper_bacterial_spot">Mancha Bacteriana del Pimiento</string>
+    <string name="disease_pepper_healthy">Pimiento Saludable</string>
 
     <!-- Potato Diseases -->
-    <string name="disease_potato_early_blight">Potato Early Blight</string>
-    <string name="disease_potato_late_blight">Potato Late Blight</string>
-    <string name="disease_potato_healthy">Potato Healthy</string>
+    <string name="disease_potato_early_blight">Tizón Temprano de la Papa</string>
+    <string name="disease_potato_late_blight">Tizón Tardío de la Papa</string>
+    <string name="disease_potato_healthy">Papa Saludable</string>
 
     <!-- Raspberry Diseases -->
-    <string name="disease_raspberry_healthy">Raspberry Healthy</string>
+    <string name="disease_raspberry_healthy">Frambuesa Saludable</string>
 
     <!-- Soybean Diseases -->
-    <string name="disease_soybean_healthy">Soybean Healthy</string>
+    <string name="disease_soybean_healthy">Soja Saludable</string>
 
     <!-- Squash Diseases -->
-    <string name="disease_squash_powdery_mildew">Squash Powdery Mildew</string>
+    <string name="disease_squash_powdery_mildew">Oidio de la Calabaza</string>
 
     <!-- Strawberry Diseases -->
-    <string name="disease_strawberry_leaf_scorch">Strawberry Leaf Scorch</string>
-    <string name="disease_strawberry_healthy">Strawberry Healthy</string>
+    <string name="disease_strawberry_leaf_scorch">Quemadura de la Hoja de Fresa</string>
+    <string name="disease_strawberry_healthy">Fresa Saludable</string>
 
     <!-- Tomato Diseases -->
-    <string name="disease_tomato_bacterial_spot">Tomato Bacterial Spot</string>
-    <string name="disease_tomato_early_blight">Tomato Early Blight</string>
-    <string name="disease_tomato_late_blight">Tomato Late Blight</string>
-    <string name="disease_tomato_leaf_mold">Tomato Leaf Mold</string>
-    <string name="disease_tomato_septoria_leaf_spot">Tomato Septoria Leaf Spot</string>
-    <string name="disease_tomato_spider_mites">Tomato Spider Mites</string>
-    <string name="disease_tomato_target_spot">Tomato Target Spot</string>
-    <string name="disease_tomato_yellow_leaf_curl_virus">Tomato Yellow Leaf Curl Virus</string>
-    <string name="disease_tomato_mosaic_virus">Tomato Mosaic Virus</string>
-    <string name="disease_tomato_healthy">Tomato Healthy</string>
+    <string name="disease_tomato_bacterial_spot">Mancha Bacteriana del Tomate</string>
+    <string name="disease_tomato_early_blight">Tizón Temprano del Tomate</string>
+    <string name="disease_tomato_late_blight">Tizón Tardío del Tomate</string>
+    <string name="disease_tomato_leaf_mold">Moho de la Hoja del Tomate</string>
+    <string name="disease_tomato_septoria_leaf_spot">Mancha Septoria del Tomate</string>
+    <string name="disease_tomato_spider_mites">Ácaros Araña del Tomate</string>
+    <string name="disease_tomato_target_spot">Mancha de Diana del Tomate</string>
+    <string name="disease_tomato_yellow_leaf_curl_virus">Virus del Enrollamiento Amarillo del Tomate</string>
+    <string name="disease_tomato_mosaic_virus">Virus del Mosaico del Tomate</string>
+    <string name="disease_tomato_healthy">Tomate Saludable</string>
 
     <!-- ==================== SCIENTIFIC NAMES ==================== -->
-
+    <!-- Los nombres científicos son iguales en todos los idiomas -->
     <string name="scientific_venturia_inaequalis">Venturia inaequalis</string>
     <string name="scientific_botryosphaeria_obtusa">Botryosphaeria obtusa</string>
     <string name="scientific_gymnosporangium_juniperi_virginianae">Gymnosporangium juniperi-virginianae</string>
@@ -168,341 +265,342 @@
     <!-- ==================== DISEASE DESCRIPTIONS ==================== -->
 
     <!-- Apple -->
-    <string name="desc_apple_scab">Fungal disease causing olive-green to black spots on leaves and fruit.</string>
-    <string name="desc_apple_black_rot">Fungal disease causing fruit rot, leaf spots, and cankers on branches.</string>
-    <string name="desc_cedar_apple_rust">Fungal disease requiring both apple and cedar/juniper hosts.</string>
-    <string name="desc_apple_healthy">Apple tree appears healthy with no visible disease symptoms.</string>
+    <string name="desc_apple_scab">Enfermedad fúngica que causa manchas verde oliva a negras en hojas y frutos.</string>
+    <string name="desc_apple_black_rot">Enfermedad fúngica que causa podredumbre del fruto, manchas en hojas y cancros en ramas.</string>
+    <string name="desc_cedar_apple_rust">Enfermedad fúngica que requiere tanto manzano como cedro/enebro como hospederos.</string>
+    <string name="desc_apple_healthy">El manzano parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Blueberry -->
-    <string name="desc_blueberry_healthy">Blueberry plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_blueberry_healthy">La planta de arándano parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Cherry -->
-    <string name="desc_cherry_powdery_mildew">Fungal disease causing white powdery coating on leaves and fruit.</string>
-    <string name="desc_cherry_healthy">Cherry tree appears healthy with no visible disease symptoms.</string>
+    <string name="desc_cherry_powdery_mildew">Enfermedad fúngica que causa recubrimiento blanco polvoriento en hojas y fruto.</string>
+    <string name="desc_cherry_healthy">El cerezo parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Corn -->
-    <string name="desc_corn_cercospora_leaf_spot">Fungal disease causing grayish lesions with dark borders on leaves.</string>
-    <string name="desc_corn_common_rust">Fungal disease causing reddish-brown pustules on leaves.</string>
-    <string name="desc_corn_northern_leaf_blight">Fungal disease causing cigar-shaped lesions on leaves.</string>
-    <string name="desc_corn_healthy">Corn plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_corn_cercospora_leaf_spot">Enfermedad fúngica que causa lesiones grisáceas con bordes oscuros en las hojas.</string>
+    <string name="desc_corn_common_rust">Enfermedad fúngica que causa pústulas rojizo-marrón en las hojas.</string>
+    <string name="desc_corn_northern_leaf_blight">Enfermedad fúngica que causa lesiones en forma de cigarro en las hojas.</string>
+    <string name="desc_corn_healthy">La planta de maíz parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Grape -->
-    <string name="desc_grape_black_rot">Fungal disease causing brown spots on leaves and shriveled black fruit.</string>
-    <string name="desc_grape_esca">Fungal complex causing tiger-striped leaves and black spots on fruit.</string>
-    <string name="desc_grape_leaf_blight">Fungal disease causing reddish-brown spots with dark borders.</string>
-    <string name="desc_grape_healthy">Grape vine appears healthy with no visible disease symptoms.</string>
+    <string name="desc_grape_black_rot">Enfermedad fúngica que causa manchas marrones en hojas y frutos negros arrugados.</string>
+    <string name="desc_grape_esca">Complejo fúngico que causa hojas con rayas de tigre y manchas negras en el fruto.</string>
+    <string name="desc_grape_leaf_blight">Enfermedad fúngica que causa manchas rojizo-marrón con bordes oscuros.</string>
+    <string name="desc_grape_healthy">La vid parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Orange -->
-    <string name="desc_citrus_greening">Bacterial disease spread by psyllids causing misshapen bitter fruit.</string>
+    <string name="desc_citrus_greening">Enfermedad bacteriana transmitida por psílidos que causa frutos deformes y amargos.</string>
 
     <!-- Peach -->
-    <string name="desc_peach_bacterial_spot">Bacterial disease causing dark spots on fruit and angular leaf lesions.</string>
-    <string name="desc_peach_healthy">Peach tree appears healthy with no visible disease symptoms.</string>
+    <string name="desc_peach_bacterial_spot">Enfermedad bacteriana que causa manchas oscuras en el fruto y lesiones angulares en hojas.</string>
+    <string name="desc_peach_healthy">El durazno parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Pepper -->
-    <string name="desc_pepper_bacterial_spot">Bacterial disease causing water-soaked spots that turn brown with yellow halos.</string>
-    <string name="desc_pepper_healthy">Pepper plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_pepper_bacterial_spot">Enfermedad bacteriana que causa manchas empapadas que se vuelven marrones con halos amarillos.</string>
+    <string name="desc_pepper_healthy">La planta de pimiento parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Potato -->
-    <string name="desc_potato_early_blight">Fungal disease causing dark brown concentric rings on leaves.</string>
-    <string name="desc_potato_late_blight">Devastating fungal disease causing brown lesions and white fungal growth.</string>
-    <string name="desc_potato_healthy">Potato plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_potato_early_blight">Enfermedad fúngica que causa anillos concéntricos marrones oscuros en las hojas.</string>
+    <string name="desc_potato_late_blight">Enfermedad fúngica devastadora que causa lesiones marrones y crecimiento fúngico blanco.</string>
+    <string name="desc_potato_healthy">La planta de papa parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Raspberry -->
-    <string name="desc_raspberry_healthy">Raspberry plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_raspberry_healthy">La planta de frambuesa parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Soybean -->
-    <string name="desc_soybean_healthy">Soybean plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_soybean_healthy">La planta de soja parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Squash -->
-    <string name="desc_squash_powdery_mildew">Fungal disease causing white powdery coating on leaves.</string>
+    <string name="desc_squash_powdery_mildew">Enfermedad fúngica que causa recubrimiento blanco polvoriento en las hojas.</string>
 
     <!-- Strawberry -->
-    <string name="desc_strawberry_leaf_scorch">Fungal disease causing purple spots that turn scorched brown.</string>
-    <string name="desc_strawberry_healthy">Strawberry plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_strawberry_leaf_scorch">Enfermedad fúngica que causa manchas púrpuras que se vuelven marrones quemadas.</string>
+    <string name="desc_strawberry_healthy">La planta de fresa parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- Tomato -->
-    <string name="desc_tomato_bacterial_spot">Bacterial disease causing water-soaked spots on leaves and fruit.</string>
-    <string name="desc_tomato_early_blight">Fungal disease causing dark concentric rings on lower leaves first.</string>
-    <string name="desc_tomato_late_blight">Destructive fungal disease causing brown lesions with white fungal growth.</string>
-    <string name="desc_tomato_leaf_mold">Fungal disease causing yellow spots on upper leaves, mold underneath.</string>
-    <string name="desc_tomato_septoria_leaf_spot">Fungal disease causing small circular spots with dark borders.</string>
-    <string name="desc_tomato_spider_mites">Pest causing stippled leaves, webbing, and plant stress.</string>
-    <string name="desc_tomato_target_spot">Fungal disease causing circular brown lesions with concentric rings.</string>
-    <string name="desc_tomato_yellow_leaf_curl_virus">Viral disease spread by whiteflies causing stunted, curled leaves.</string>
-    <string name="desc_tomato_mosaic_virus">Viral disease causing mottled light and dark green leaf patterns.</string>
-    <string name="desc_tomato_healthy">Tomato plant appears healthy with no visible disease symptoms.</string>
+    <string name="desc_tomato_bacterial_spot">Enfermedad bacteriana que causa manchas empapadas en hojas y fruto.</string>
+    <string name="desc_tomato_early_blight">Enfermedad fúngica que causa anillos oscuros concéntricos en las hojas inferiores primero.</string>
+    <string name="desc_tomato_late_blight">Enfermedad fúngica destructiva que causa lesiones marrones con crecimiento fúngico blanco.</string>
+    <string name="desc_tomato_leaf_mold">Enfermedad fúngica que causa manchas amarillas en hojas superiores, moho debajo.</string>
+    <string name="desc_tomato_septoria_leaf_spot">Enfermedad fúngica que causa pequeñas manchas circulares con bordes oscuros.</string>
+    <string name="desc_tomato_spider_mites">Plaga que causa hojas punteadas, telarañas y estrés en la planta.</string>
+    <string name="desc_tomato_target_spot">Enfermedad fúngica que causa lesiones circulares marrones con anillos concéntricos.</string>
+    <string name="desc_tomato_yellow_leaf_curl_virus">Enfermedad viral transmitida por mosca blanca que causa hojas enrolladas y atrofiadas.</string>
+    <string name="desc_tomato_mosaic_virus">Enfermedad viral que causa patrones de hojas verdes claras y oscuras en mosaico.</string>
+    <string name="desc_tomato_healthy">La planta de tomate parece saludable sin síntomas visibles de enfermedad.</string>
 
     <!-- ==================== TREATMENT STEPS TITLES ==================== -->
 
     <!-- Apple Scab -->
-    <string name="treatment_apple_scab_1_title">Remove infected leaves</string>
-    <string name="treatment_apple_scab_2_title">Apply fungicide</string>
-    <string name="treatment_apple_scab_3_title">Prune for airflow</string>
+    <string name="treatment_apple_scab_1_title">Eliminar hojas infectadas</string>
+    <string name="treatment_apple_scab_2_title">Aplicar fungicida</string>
+    <string name="treatment_apple_scab_3_title">Podar para ventilación</string>
 
     <!-- Apple Black Rot -->
-    <string name="treatment_apple_black_rot_1_title">Prune cankers</string>
-    <string name="treatment_apple_black_rot_2_title">Remove mummified fruit</string>
-    <string name="treatment_apple_black_rot_3_title">Apply fungicide</string>
+    <string name="treatment_apple_black_rot_1_title">Podar cancros</string>
+    <string name="treatment_apple_black_rot_2_title">Eliminar frutos momificados</string>
+    <string name="treatment_apple_black_rot_3_title">Aplicar fungicida</string>
 
     <!-- Cedar Apple Rust -->
-    <string name="treatment_cedar_apple_rust_1_title">Remove cedar hosts</string>
-    <string name="treatment_cedar_apple_rust_2_title">Apply fungicide</string>
-    <string name="treatment_cedar_apple_rust_3_title">Plant resistant varieties</string>
+    <string name="treatment_cedar_apple_rust_1_title">Eliminar cedros cercanos</string>
+    <string name="treatment_cedar_apple_rust_2_title">Aplicar fungicida</string>
+    <string name="treatment_cedar_apple_rust_3_title">Plantar variedades resistentes</string>
 
     <!-- Continue maintenance (Healthy) -->
-    <string name="treatment_continue_maintenance_title">Continue maintenance</string>
-    <string name="treatment_monitor_regularly_title">Monitor regularly</string>
-    <string name="treatment_prune_as_needed_title">Prune as needed</string>
+    <string name="treatment_continue_maintenance_title">Continuar mantenimiento</string>
+    <string name="treatment_monitor_regularly_title">Monitorear regularmente</string>
+    <string name="treatment_prune_as_needed_title">Podar según sea necesario</string>
 
     <!-- Cherry Powdery Mildew -->
-    <string name="treatment_cherry_powdery_mildew_1_title">Apply fungicide</string>
-    <string name="treatment_cherry_powdery_mildew_2_title">Improve airflow</string>
-    <string name="treatment_cherry_powdery_mildew_3_title">Water at base</string>
+    <string name="treatment_cherry_powdery_mildew_1_title">Aplicar fungicida</string>
+    <string name="treatment_cherry_powdery_mildew_2_title">Mejorar circulación de aire</string>
+    <string name="treatment_cherry_powdery_mildew_3_title">Regar a la base</string>
 
     <!-- Corn -->
-    <string name="treatment_corn_cercospora_1_title">Rotate crops</string>
-    <string name="treatment_corn_cercospora_2_title">Apply fungicide</string>
-    <string name="treatment_corn_cercospora_3_title">Tillage</string>
+    <string name="treatment_corn_cercospora_1_title">Rotar cultivos</string>
+    <string name="treatment_corn_cercospora_2_title">Aplicar fungicida</string>
+    <string name="treatment_corn_cercospora_3_title">Labranza</string>
 
-    <string name="treatment_corn_rust_1_title">Plant resistant hybrids</string>
-    <string name="treatment_corn_rust_2_title">Apply fungicide</string>
-    <string name="treatment_corn_rust_3_title">Early planting</string>
+    <string name="treatment_corn_rust_1_title">Plantar híbridos resistentes</string>
+    <string name="treatment_corn_rust_2_title">Aplicar fungicida</string>
+    <string name="treatment_corn_rust_3_title">Siembra temprana</string>
 
-    <string name="treatment_corn_blight_1_title">Use resistant varieties</string>
-    <string name="treatment_corn_blight_2_title">Crop rotation</string>
-    <string name="treatment_corn_blight_3_title">Fungicide application</string>
+    <string name="treatment_corn_blight_1_title">Usar variedades resistentes</string>
+    <string name="treatment_corn_blight_2_title">Rotación de cultivos</string>
+    <string name="treatment_corn_blight_3_title">Aplicación de fungicida</string>
 
     <!-- Grape -->
-    <string name="treatment_grape_black_rot_1_title">Remove mummies</string>
-    <string name="treatment_grape_black_rot_2_title">Prune infected parts</string>
-    <string name="treatment_grape_black_rot_3_title">Apply fungicide</string>
+    <string name="treatment_grape_black_rot_1_title">Eliminar momias</string>
+    <string name="treatment_grape_black_rot_2_title">Podar partes infectadas</string>
+    <string name="treatment_grape_black_rot_3_title">Aplicar fungicida</string>
 
-    <string name="treatment_grape_esca_1_title">Prune during dry weather</string>
-    <string name="treatment_grape_esca_2_title">Treat pruning wounds</string>
-    <string name="treatment_grape_esca_3_title">Remove dead wood</string>
+    <string name="treatment_grape_esca_1_title">Podar en clima seco</string>
+    <string name="treatment_grape_esca_2_title">Tratar heridas de poda</string>
+    <string name="treatment_grape_esca_3_title">Eliminar madera muerta</string>
 
-    <string name="treatment_grape_leaf_blight_1_title">Apply fungicide</string>
-    <string name="treatment_grape_leaf_blight_2_title">Improve ventilation</string>
-    <string name="treatment_grape_leaf_blight_3_title">Remove infected leaves</string>
+    <string name="treatment_grape_leaf_blight_1_title">Aplicar fungicida</string>
+    <string name="treatment_grape_leaf_blight_2_title">Mejorar ventilación</string>
+    <string name="treatment_grape_leaf_blight_3_title">Eliminar hojas infectadas</string>
 
     <!-- Citrus Greening -->
-    <string name="treatment_citrus_greening_1_title">Remove infected trees</string>
-    <string name="treatment_citrus_greening_2_title">Control psyllids</string>
-    <string name="treatment_citrus_greening_3_title">Plant certified trees</string>
+    <string name="treatment_citrus_greening_1_title">Eliminar árboles infectados</string>
+    <string name="treatment_citrus_greening_2_title">Controlar psílidos</string>
+    <string name="treatment_citrus_greening_3_title">Plantar árboles certificados</string>
 
     <!-- Peach Bacterial Spot -->
-    <string name="treatment_peach_bacterial_spot_1_title">Plant resistant varieties</string>
-    <string name="treatment_peach_bacterial_spot_2_title">Copper sprays</string>
-    <string name="treatment_peach_bacterial_spot_3_title">Avoid overhead irrigation</string>
+    <string name="treatment_peach_bacterial_spot_1_title">Plantar variedades resistentes</string>
+    <string name="treatment_peach_bacterial_spot_2_title">Aplicaciones de cobre</string>
+    <string name="treatment_peach_bacterial_spot_3_title">Evitar riego por aspersión</string>
 
     <!-- Pepper Bacterial Spot -->
-    <string name="treatment_pepper_bacterial_spot_1_title">Use certified seed</string>
-    <string name="treatment_pepper_bacterial_spot_2_title">Copper sprays</string>
-    <string name="treatment_pepper_bacterial_spot_3_title">Avoid wetting foliage</string>
+    <string name="treatment_pepper_bacterial_spot_1_title">Usar semilla certificada</string>
+    <string name="treatment_pepper_bacterial_spot_1_desc">Adquirir semillas libres de patógenos de proveedores certificados para evitar introducir la bacteria al cultivo.</string>
+    <string name="treatment_pepper_bacterial_spot_2_title">Aplicaciones de cobre</string>
+    <string name="treatment_pepper_bacterial_spot_3_title">Evitar mojar follaje</string>
 
     <!-- Potato -->
-    <string name="treatment_potato_early_blight_1_title">Apply fungicide</string>
-    <string name="treatment_potato_early_blight_2_title">Rotate crops</string>
-    <string name="treatment_potato_early_blight_3_title">Remove infected leaves</string>
+    <string name="treatment_potato_early_blight_1_title">Aplicar fungicida</string>
+    <string name="treatment_potato_early_blight_2_title">Rotar cultivos</string>
+    <string name="treatment_potato_early_blight_3_title">Eliminar hojas infectadas</string>
 
-    <string name="treatment_potato_late_blight_1_title">Remove infected plants</string>
-    <string name="treatment_potato_late_blight_2_title">Apply fungicide</string>
-    <string name="treatment_potato_late_blight_3_title">Hill potatoes</string>
+    <string name="treatment_potato_late_blight_1_title">Eliminar plantas infectadas</string>
+    <string name="treatment_potato_late_blight_2_title">Aplicar fungicida</string>
+    <string name="treatment_potato_late_blight_3_title">Aporcar papas</string>
 
     <!-- Squash Powdery Mildew -->
-    <string name="treatment_squash_powdery_mildew_1_title">Apply fungicide</string>
-    <string name="treatment_squash_powdery_mildew_2_title">Space plants</string>
-    <string name="treatment_squash_powdery_mildew_3_title">Water at base</string>
+    <string name="treatment_squash_powdery_mildew_1_title">Aplicar fungicida</string>
+    <string name="treatment_squash_powdery_mildew_2_title">Espaciar plantas</string>
+    <string name="treatment_squash_powdery_mildew_3_title">Regar a la base</string>
 
     <!-- Strawberry -->
-    <string name="treatment_strawberry_leaf_scorch_1_title">Remove infected leaves</string>
-    <string name="treatment_strawberry_leaf_scorch_2_title">Mulch properly</string>
-    <string name="treatment_strawberry_leaf_scorch_3_title">Apply fungicide</string>
+    <string name="treatment_strawberry_leaf_scorch_1_title">Eliminar hojas infectadas</string>
+    <string name="treatment_strawberry_leaf_scorch_2_title">Acolchar adecuadamente</string>
+    <string name="treatment_strawberry_leaf_scorch_3_title">Aplicar fungicida</string>
 
     <!-- Tomato -->
-    <string name="treatment_tomato_bacterial_spot_1_title">Use resistant varieties</string>
-    <string name="treatment_tomato_bacterial_spot_2_title">Copper sprays</string>
-    <string name="treatment_tomato_bacterial_spot_3_title">Avoid overhead water</string>
+    <string name="treatment_tomato_bacterial_spot_1_title">Usar variedades resistentes</string>
+    <string name="treatment_tomato_bacterial_spot_2_title">Aplicaciones de cobre</string>
+    <string name="treatment_tomato_bacterial_spot_3_title">Evitar riego por aspersión</string>
 
-    <string name="treatment_tomato_early_blight_1_title">Remove infected leaves</string>
-    <string name="treatment_tomato_early_blight_2_title">Apply fungicide</string>
-    <string name="treatment_tomato_early_blight_3_title">Mulch</string>
+    <string name="treatment_tomato_early_blight_1_title">Eliminar hojas infectadas</string>
+    <string name="treatment_tomato_early_blight_2_title">Aplicar fungicida</string>
+    <string name="treatment_tomato_early_blight_3_title">Acolchar</string>
 
-    <string name="treatment_tomato_late_blight_1_title">Remove infected plants</string>
-    <string name="treatment_tomato_late_blight_2_title">Apply fungicide</string>
-    <string name="treatment_tomato_late_blight_3_title">Space plants</string>
+    <string name="treatment_tomato_late_blight_1_title">Eliminar plantas infectadas</string>
+    <string name="treatment_tomato_late_blight_2_title">Aplicar fungicida</string>
+    <string name="treatment_tomato_late_blight_3_title">Espaciar plantas</string>
 
-    <string name="treatment_tomato_leaf_mold_1_title">Improve ventilation</string>
-    <string name="treatment_tomato_leaf_mold_2_title">Reduce humidity</string>
-    <string name="treatment_tomato_leaf_mold_3_title">Apply fungicide</string>
+    <string name="treatment_tomato_leaf_mold_1_title">Mejorar ventilación</string>
+    <string name="treatment_tomato_leaf_mold_2_title">Reducir humedad</string>
+    <string name="treatment_tomato_leaf_mold_3_title">Aplicar fungicida</string>
 
-    <string name="treatment_tomato_septoria_1_title">Remove infected leaves</string>
-    <string name="treatment_tomato_septoria_2_title">Mulch</string>
-    <string name="treatment_tomato_septoria_3_title">Rotate crops</string>
+    <string name="treatment_tomato_septoria_1_title">Eliminar hojas infectadas</string>
+    <string name="treatment_tomato_septoria_2_title">Acolchar</string>
+    <string name="treatment_tomato_septoria_3_title">Rotar cultivos</string>
 
-    <string name="treatment_tomato_spider_mites_1_title">Spray water</string>
-    <string name="treatment_tomato_spider_mites_2_title">Apply miticide</string>
-    <string name="treatment_tomato_spider_mites_3_title">Increase humidity</string>
+    <string name="treatment_tomato_spider_mites_1_title">Rociar agua</string>
+    <string name="treatment_tomato_spider_mites_2_title">Aplicar acaricida</string>
+    <string name="treatment_tomato_spider_mites_3_title">Aumentar humedad</string>
 
-    <string name="treatment_tomato_target_spot_1_title">Remove infected leaves</string>
-    <string name="treatment_tomato_target_spot_2_title">Apply fungicide</string>
-    <string name="treatment_tomato_target_spot_3_title">Space plants</string>
+    <string name="treatment_tomato_target_spot_1_title">Eliminar hojas infectadas</string>
+    <string name="treatment_tomato_target_spot_2_title">Aplicar fungicida</string>
+    <string name="treatment_tomato_target_spot_3_title">Espaciar plantas</string>
 
-    <string name="treatment_tomato_yellow_leaf_curl_1_title">Remove infected plants</string>
-    <string name="treatment_tomato_yellow_leaf_curl_2_title">Control whiteflies</string>
-    <string name="treatment_tomato_yellow_leaf_curl_3_title">Use resistant varieties</string>
+    <string name="treatment_tomato_yellow_leaf_curl_1_title">Eliminar plantas infectadas</string>
+    <string name="treatment_tomato_yellow_leaf_curl_2_title">Controlar mosca blanca</string>
+    <string name="treatment_tomato_yellow_leaf_curl_3_title">Usar variedades resistentes</string>
 
-    <string name="treatment_tomato_mosaic_1_title">Remove infected plants</string>
-    <string name="treatment_tomato_mosaic_2_title">Sanitize tools</string>
-    <string name="treatment_tomato_mosaic_3_title">Wash hands</string>
+    <string name="treatment_tomato_mosaic_1_title">Eliminar plantas infectadas</string>
+    <string name="treatment_tomato_mosaic_2_title">Desinfectar herramientas</string>
+    <string name="treatment_tomato_mosaic_3_title">Lavarse las manos</string>
 
     <!-- ==================== TREATMENT STEPS DESCRIPTIONS ==================== -->
 
     <!-- Apple Scab -->
-    <string name="treatment_apple_scab_1_desc">Rake and remove fallen leaves to reduce fungal spores.</string>
-    <string name="treatment_apple_scab_2_desc">Use sulfur-based fungicides during early spring.</string>
-    <string name="treatment_apple_scab_3_desc">Improve tree ventilation to reduce humidity.</string>
+    <string name="treatment_apple_scab_1_desc">Rastrille y elimine las hojas caídas para reducir las esporas fúngicas.</string>
+    <string name="treatment_apple_scab_2_desc">Use fungicidas a base de azufre durante la primavera temprana.</string>
+    <string name="treatment_apple_scab_3_desc">Mejore la ventilación del árbol para reducir la humedad.</string>
 
     <!-- Apple Black Rot -->
-    <string name="treatment_apple_black_rot_1_desc">Cut branches 4 inches below visible cankers.</string>
-    <string name="treatment_apple_black_rot_2_desc">Pick and destroy all infected fruits.</string>
-    <string name="treatment_apple_black_rot_3_desc">Use captan or mancozeb-based fungicides.</string>
+    <string name="treatment_apple_black_rot_1_desc">Corte las ramas 10 cm debajo de los cancros visibles.</string>
+    <string name="treatment_apple_black_rot_2_desc">Recoja y destruya todos los frutos infectados.</string>
+    <string name="treatment_apple_black_rot_3_desc">Use fungicidas a base de captan o mancozeb.</string>
 
     <!-- Cedar Apple Rust -->
-    <string name="treatment_cedar_apple_rust_1_desc">Remove nearby cedar/juniper trees if possible.</string>
-    <string name="treatment_cedar_apple_rust_2_desc">Use myclobutanil or triadimefon sprays.</string>
-    <string name="treatment_cedar_apple_rust_3_desc">Consider resistant apple varieties for future.</string>
+    <string name="treatment_cedar_apple_rust_1_desc">Elimine cedros/enebros cercanos si es posible.</string>
+    <string name="treatment_cedar_apple_rust_2_desc">Use pulverizaciones de myclobutanil o triadimefon.</string>
+    <string name="treatment_cedar_apple_rust_3_desc">Considere variedades de manzano resistentes para el futuro.</string>
 
     <!-- Healthy maintenance -->
-    <string name="treatment_continue_maintenance_desc">Maintain regular watering and fertilization schedule.</string>
-    <string name="treatment_monitor_regularly_desc">Check leaves periodically for early signs of disease.</string>
-    <string name="treatment_prune_as_needed_desc">Remove dead or damaged branches to maintain health.</string>
+    <string name="treatment_continue_maintenance_desc">Mantenga el programa regular de riego y fertilización.</string>
+    <string name="treatment_monitor_regularly_desc">Revise las hojas periódicamente para detectar signos tempranos de enfermedad.</string>
+    <string name="treatment_prune_as_needed_desc">Elimine ramas muertas o dañadas para mantener la salud.</string>
 
     <!-- Blueberry -->
-    <string name="treatment_blueberry_1_desc">Keep soil pH between 4.5-5.5 for optimal growth.</string>
-    <string name="treatment_blueberry_2_desc">Apply 2-3 inches of pine bark mulch.</string>
-    <string name="treatment_blueberry_3_desc">Remove canes older than 6 years.</string>
+    <string name="treatment_blueberry_1_desc">Mantenga el pH del suelo entre 4.5-5.5 para un crecimiento óptimo.</string>
+    <string name="treatment_blueberry_2_desc">Aplique 5-7 cm de mantillo de corteza de pino.</string>
+    <string name="treatment_blueberry_3_desc">Elimine los tallos con más de 6 años.</string>
 
     <!-- Cherry -->
-    <string name="treatment_cherry_1_desc">Maintain regular pruning and fertilization.</string>
-    <string name="treatment_cherry_2_desc">Check for aphids and other common cherry pests.</string>
-    <string name="treatment_cherry_3_desc">Pick fruit when ripe to prevent over-ripening on tree.</string>
+    <string name="treatment_cherry_1_desc">Mantenga la poda y fertilización regulares.</string>
+    <string name="treatment_cherry_2_desc">Revise áfidos y otras plagas comunes del cerezo.</string>
+    <string name="treatment_cherry_3_desc">Recoja el fruto cuando esté maduro para evitar sobremaduración.</string>
 
     <!-- Corn -->
-    <string name="treatment_corn_cercospora_1_desc">Avoid planting corn in the same field for 2+ years.</string>
-    <string name="treatment_corn_cercospora_2_desc">Use azoxystrobin or pyraclostrobin if severe.</string>
-    <string name="treatment_corn_cercospora_3_desc">Bury crop residue to reduce fungal overwintering.</string>
+    <string name="treatment_corn_cercospora_1_desc">Evite plantar maíz en el mismo campo por más de 2 años.</string>
+    <string name="treatment_corn_cercospora_2_desc">Use azoxystrobin o pyraclostrobin si es severo.</string>
+    <string name="treatment_corn_cercospora_3_desc">Entierre el residuo de cultivo para reducir el hibernación fúngica.</string>
 
-    <string name="treatment_corn_rust_1_desc">Use rust-resistant corn varieties.</string>
-    <string name="treatment_corn_rust_2_desc">Use foliar fungicides if rust is severe.</string>
-    <string name="treatment_corn_rust_3_desc">Plant early to avoid peak rust season.</string>
+    <string name="treatment_corn_rust_1_desc">Use variedades de maíz resistentes a la roya.</string>
+    <string name="treatment_corn_rust_2_desc">Use fungicidas foliares si la roya es severa.</string>
+    <string name="treatment_corn_rust_3_desc">Plante temprano para evitar la temporada pico de roya.</string>
 
-    <string name="treatment_corn_blight_1_desc">Plant hybrids with Ht resistance genes.</string>
-    <string name="treatment_corn_blight_2_desc">Rotate with non-host crops for 1-2 years.</string>
-    <string name="treatment_corn_blight_3_desc">Apply if lesions appear before tasseling.</string>
+    <string name="treatment_corn_blight_1_desc">Plante híbridos con genes de resistencia Ht.</string>
+    <string name="treatment_corn_blight_2_desc">Rote con cultivos no hospederos por 1-2 años.</string>
+    <string name="treatment_corn_blight_3_desc">Aplique si aparecen lesiones antes de la espigación.</string>
 
     <!-- Grape -->
-    <string name="treatment_grape_black_rot_1_desc">Pick and destroy all shriveled berries.</string>
-    <string name="treatment_grape_black_rot_2_desc">Cut out diseased canes during dormancy.</string>
-    <string name="treatment_grape_black_rot_3_desc">Use mancozeb or myclobutanil sprays.</string>
+    <string name="treatment_grape_black_rot_1_desc">Recoja y destruya todas las bayas arrugadas.</string>
+    <string name="treatment_grape_black_rot_2_desc">Corte los sarmientos enfermos durante la dormancia.</string>
+    <string name="treatment_grape_black_rot_3_desc">Use pulverizaciones de mancozeb o myclobutanil.</string>
 
-    <string name="treatment_grape_esca_1_desc">Make pruning cuts only when vines are dry.</string>
-    <string name="treatment_grape_esca_2_desc">Apply wound dressing to cuts larger than 1 inch.</string>
-    <string name="treatment_grape_esca_3_desc">Eliminate all dead and dying vines.</string>
+    <string name="treatment_grape_esca_1_desc">Haga cortes de poda solo cuando las vides estén secas.</string>
+    <string name="treatment_grape_esca_2_desc">Aplique cubierta de heridas a cortes mayores a 2.5 cm.</string>
+    <string name="treatment_grape_esca_3_desc">Elimine todas las vides muertas y moribundas.</string>
 
-    <string name="treatment_grape_leaf_blight_1_desc">Use copper-based fungicides in spring.</string>
-    <string name="treatment_grape_leaf_blight_2_desc">Prune for better air circulation.</string>
-    <string name="treatment_grape_leaf_blight_3_desc">Clear fallen and infected leaves.</string>
+    <string name="treatment_grape_leaf_blight_1_desc">Use fungicidas a base de cobre en primavera.</string>
+    <string name="treatment_grape_leaf_blight_2_desc">Pode para mejorar la circulación de aire.</string>
+    <string name="treatment_grape_leaf_blight_3_desc">Limpie hojas caídas e infectadas.</string>
 
     <!-- Citrus Greening -->
-    <string name="treatment_citrus_greening_1_desc">Destroy severely infected trees immediately.</string>
-    <string name="treatment_citrus_greening_2_desc">Apply insecticides to control Asian citrus psyllid.</string>
-    <string name="treatment_citrus_greening_3_desc">Use only certified disease-free nursery stock.</string>
+    <string name="treatment_citrus_greening_1_desc">Destruya inmediatamente los árboles severamente infectados.</string>
+    <string name="treatment_citrus_greening_2_desc">Aplique insecticidas para controlar el psílido asiático de los cítricos.</string>
+    <string name="treatment_citrus_greening_3_desc">Use únicamente planta de vivero certificada libre de enfermedades.</string>
 
     <!-- Peach -->
-    <string name="treatment_peach_1_desc">Prune to maintain open center shape.</string>
-    <string name="treatment_peach_2_desc">Remove excess fruit for better size and quality.</string>
-    <string name="treatment_peach_3_desc">Apply balanced fertilizer in early spring.</string>
+    <string name="treatment_peach_1_desc">Pode para mantener forma de centro abierto.</string>
+    <string name="treatment_peach_2_desc">Elimine exceso de fruto para mejorar tamaño y calidad.</string>
+    <string name="treatment_peach_3_desc">Aplique fertilizante balanceado en primavera temprana.</string>
 
     <!-- Pepper -->
-    <string name="treatment_pepper_1_desc">Maintain even soil moisture.</string>
-    <string name="treatment_pepper_2_desc">Use phosphorus for fruit development.</string>
-    <string name="treatment_pepper_3_desc">Stake tall varieties to prevent breakage.</string>
+    <string name="treatment_pepper_1_desc">Mantenga humedad uniforme del suelo.</string>
+    <string name="treatment_pepper_2_desc">Use fósforo para el desarrollo del fruto.</string>
+    <string name="treatment_pepper_3_desc">Estaque variedades altas para evitar quiebre.</string>
 
     <!-- Potato -->
-    <string name="treatment_potato_early_blight_1_desc">Use chlorothalonil or mancozeb sprays.</string>
-    <string name="treatment_potato_early_blight_2_desc">Avoid planting tomatoes or potatoes for 3+ years.</string>
-    <string name="treatment_potato_early_blight_3_desc">Prune lower infected leaves.</string>
+    <string name="treatment_potato_early_blight_1_desc">Use pulverizaciones de chlorothalonil o mancozeb.</string>
+    <string name="treatment_potato_early_blight_2_desc">Evite plantar tomates o papas por 3+ años.</string>
+    <string name="treatment_potato_early_blight_3_desc">Pode hojas infectadas inferiores.</string>
 
-    <string name="treatment_potato_late_blight_1_desc">Destroy all infected plants immediately.</string>
-    <string name="treatment_potato_late_blight_2_desc">Use mancozeb or chlorothalonil preventively.</string>
-    <string name="treatment_potato_late_blight_3_desc">Maintain proper hilling to protect tubers.</string>
+    <string name="treatment_potato_late_blight_1_desc">Destruya todas las plantas infectadas inmediatamente.</string>
+    <string name="treatment_potato_late_blight_2_desc">Use mancozeb o chlorothalonil preventivamente.</string>
+    <string name="treatment_potato_late_blight_3_desc">Mantenga el adecuado aporcado para proteger tubérculos.</string>
 
     <!-- Raspberry -->
-    <string name="treatment_raspberry_1_desc">Remove floricanes after fruiting.</string>
-    <string name="treatment_raspberry_2_desc">Use trellis to keep canes upright.</string>
-    <string name="treatment_raspberry_3_desc">Keep planting area weed-free.</string>
+    <string name="treatment_raspberry_1_desc">Elimine floricanos después de la fructificación.</string>
+    <string name="treatment_raspberry_2_desc">Use espaldera para mantener los tallos erguidos.</string>
+    <string name="treatment_raspberry_3_desc">Mantenga el área de plantación libre de malezas.</string>
 
     <!-- Soybean -->
-    <string name="treatment_soybean_1_desc">Use Rhizobium inoculant for nitrogen fixation.</string>
-    <string name="treatment_soybean_2_desc">Rotate with corn or small grains.</string>
-    <string name="treatment_soybean_3_desc">Control weeds during early growth.</string>
+    <string name="treatment_soybean_1_desc">Use inoculante de Rhizobium para fijación de nitrógeno.</string>
+    <string name="treatment_soybean_2_desc">Rote con maíz o cereales pequeños.</string>
+    <string name="treatment_soybean_3_desc">Controle malezas durante el crecimiento temprano.</string>
 
     <!-- Squash -->
-    <string name="treatment_squash_powdery_mildew_1_desc">Use sulfur or potassium bicarbonate.</string>
-    <string name="treatment_squash_powdery_mildew_2_desc">Allow for good air circulation.</string>
-    <string name="treatment_squash_powdery_mildew_3_desc">Avoid wetting leaves during irrigation.</string>
+    <string name="treatment_squash_powdery_mildew_1_desc">Use azufre o bicarbonato de potasio.</string>
+    <string name="treatment_squash_powdery_mildew_2_desc">Permita buena circulación de aire.</string>
+    <string name="treatment_squash_powdery_mildew_3_desc">Evite mojar las hojas durante el riego.</string>
 
     <!-- Strawberry -->
-    <string name="treatment_strawberry_leaf_scorch_1_desc">Pick and destroy infected foliage.</string>
-    <string name="treatment_strawberry_leaf_scorch_2_desc">Use plastic mulch to prevent soil splash.</string>
-    <string name="treatment_strawberry_leaf_scorch_3_desc">Use captan or thiram sprays.</string>
+    <string name="treatment_strawberry_leaf_scorch_1_desc">Recoja y destruya follaje infectado.</string>
+    <string name="treatment_strawberry_leaf_scorch_2_desc">Use mantillo plástico para prevenir salpicadura de suelo.</string>
+    <string name="treatment_strawberry_leaf_scorch_3_desc">Use pulverizaciones de captan o thiram.</string>
 
-    <string name="treatment_strawberry_1_desc">Thin plants and remove old leaves after harvest.</string>
-    <string name="treatment_strawberry_2_desc">Apply nitrogen after renovation.</string>
-    <string name="treatment_strawberry_3_desc">Mulch heavily before winter.</string>
+    <string name="treatment_strawberry_1_desc">Adelgace plantas y elimine hojas viejas después de la cosecha.</string>
+    <string name="treatment_strawberry_2_desc">Aplique nitrógeno después de la renovación.</string>
+    <string name="treatment_strawberry_3_desc">Acolche abundantemente antes del invierno.</string>
 
     <!-- Tomato -->
-    <string name="treatment_tomato_bacterial_spot_1_desc">Plant tolerant cultivars.</string>
-    <string name="treatment_tomato_bacterial_spot_2_desc">Apply copper bactericides preventively.</string>
-    <string name="treatment_tomato_bacterial_spot_3_desc">Use drip irrigation only.</string>
+    <string name="treatment_tomato_bacterial_spot_1_desc">Plante cultivares tolerantes.</string>
+    <string name="treatment_tomato_bacterial_spot_2_desc">Aplique bactericidas de cobre preventivamente.</string>
+    <string name="treatment_tomato_bacterial_spot_3_desc">Use únicamente riego por goteo.</string>
 
-    <string name="treatment_tomato_early_blight_1_desc">Prune and destroy infected lower leaves.</string>
-    <string name="treatment_tomato_early_blight_2_desc">Use chlorothalonil or copper sprays.</string>
-    <string name="treatment_tomato_early_blight_3_desc">Apply mulch to prevent soil splash.</string>
+    <string name="treatment_tomato_early_blight_1_desc">Pode y destruya las hojas inferiores infectadas.</string>
+    <string name="treatment_tomato_early_blight_2_desc">Use pulverizaciones de chlorothalonil o cobre.</string>
+    <string name="treatment_tomato_early_blight_3_desc">Acolche para prevenir salpicadura de suelo.</string>
 
-    <string name="treatment_tomato_late_blight_1_desc">Destroy all infected tissue immediately.</string>
-    <string name="treatment_tomato_late_blight_2_desc">Use mancozeb or chlorothalonil urgently.</string>
-    <string name="treatment_tomato_late_blight_3_desc">Improve air circulation around plants.</string>
+    <string name="treatment_tomato_late_blight_1_desc">Destruya todo tejido infectado inmediatamente.</string>
+    <string name="treatment_tomato_late_blight_2_desc">Use mancozeb o chlorothalonil urgentemente.</string>
+    <string name="treatment_tomato_late_blight_3_desc">Mejore la circulación de aire alrededor de las plantas.</string>
 
-    <string name="treatment_tomato_leaf_mold_1_desc">Increase air circulation in greenhouse.</string>
-    <string name="treatment_tomato_leaf_mold_2_desc">Avoid overhead watering.</string>
-    <string name="treatment_tomato_leaf_mold_3_desc">Use chlorothalonil sprays.</string>
+    <string name="treatment_tomato_leaf_mold_1_desc">Aumente la circulación de aire en invernadero.</string>
+    <string name="treatment_tomato_leaf_mold_2_desc">Evite riego por aspersión.</string>
+    <string name="treatment_tomato_leaf_mold_3_desc">Use pulverizaciones de chlorothalonil.</string>
 
-    <string name="treatment_tomato_septoria_1_desc">Prune and destroy infected foliage.</string>
-    <string name="treatment_tomato_septoria_2_desc">Prevent soil splash with organic mulch.</string>
-    <string name="treatment_tomato_septoria_3_desc">Avoid planting tomatoes in same spot.</string>
+    <string name="treatment_tomato_septoria_1_desc">Pode y destruya follaje infectado.</string>
+    <string name="treatment_tomato_septoria_2_desc">Prevenga salpicadura de suelo con mantillo orgánico.</string>
+    <string name="treatment_tomato_septoria_3_desc">Evite plantar tomates en el mismo lugar.</string>
 
-    <string name="treatment_tomato_spider_mites_1_desc">Use strong water spray to dislodge mites.</string>
-    <string name="treatment_tomato_spider_mites_2_desc">Use insecticidal soap or neem oil.</string>
-    <string name="treatment_tomato_spider_mites_3_desc">Mites prefer dry conditions.</string>
+    <string name="treatment_tomato_spider_mites_1_desc">Use aspersión fuerte de agua para desalojar ácaros.</string>
+    <string name="treatment_tomato_spider_mites_2_desc">Use jabón insecticida o aceite de neem.</string>
+    <string name="treatment_tomato_spider_mites_3_desc">Los ácaros prefieren condiciones secas.</string>
 
-    <string name="treatment_tomato_target_spot_1_desc">Clear infected foliage promptly.</string>
-    <string name="treatment_tomato_target_spot_2_desc">Use chlorothalonil or mancozeb.</string>
-    <string name="treatment_tomato_target_spot_3_desc">Improve air circulation.</string>
+    <string name="treatment_tomato_target_spot_1_desc">Limpie follaje infectado prontamente.</string>
+    <string name="treatment_tomato_target_spot_2_desc">Use chlorothalonil o mancozeb.</string>
+    <string name="treatment_tomato_target_spot_3_desc">Mejore la circulación de aire.</string>
 
-    <string name="treatment_tomato_yellow_leaf_curl_1_desc">Destroy infected plants immediately.</string>
-    <string name="treatment_tomato_yellow_leaf_curl_2_desc">Use insecticides or reflective mulch.</string>
-    <string name="treatment_tomato_yellow_leaf_curl_3_desc">Plant TYLCV-resistant cultivars.</string>
+    <string name="treatment_tomato_yellow_leaf_curl_1_desc">Destruya inmediatamente plantas infectadas.</string>
+    <string name="treatment_tomato_yellow_leaf_curl_2_desc">Use insecticidas o mantillo reflectivo.</string>
+    <string name="treatment_tomato_yellow_leaf_curl_3_desc">Plante cultivares resistentes a TYLCV.</string>
 
-    <string name="treatment_tomato_mosaic_1_desc">Destroy all infected plants immediately.</string>
-    <string name="treatment_tomato_mosaic_2_desc">Disinfect pruning tools with bleach.</string>
-    <string name="treatment_tomato_mosaic_3_desc">Tobacco users should wash hands before handling.</string>
+    <string name="treatment_tomato_mosaic_1_desc">Destruya inmediatamente todas las plantas infectadas.</string>
+    <string name="treatment_tomato_mosaic_2_desc">Desinfecte herramientas de poda con cloro.</string>
+    <string name="treatment_tomato_mosaic_3_desc">Los usuarios de tabaco deben lavarse las manos antes de manipular.</string>
 
     <!-- Healthy treatments -->
-    <string name="treatment_healthy_1_desc">Maintain consistent watering and fertilizing.</string>
-    <string name="treatment_healthy_2_desc">Remove suckers for better fruit production.</string>
-    <string name="treatment_healthy_3_desc">Check regularly for early signs of disease.</string>
+    <string name="treatment_healthy_1_desc">Mantenga riego y fertilización consistentes.</string>
+    <string name="treatment_healthy_2_desc">Elimine chupones para mejor producción de fruto.</string>
+    <string name="treatment_healthy_3_desc">Revise regularmente signos tempranos de enfermedad.</string>
 
 </resources>

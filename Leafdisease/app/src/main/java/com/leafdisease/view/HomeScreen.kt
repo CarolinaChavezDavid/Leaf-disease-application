@@ -46,7 +46,7 @@ import com.leafdisease.view.components.ScreenHeader
 fun HomeScreen(
     onTakePhoto: () -> Unit = {},
     onUploadImage: () -> Unit = {},
-    selectedModel: ModelType = ModelType.MOBILENET_V2,
+    selectedModel: ModelType = ModelType.MOBILENET_V3_SMALL,
     onModelSelected: (ModelType) -> Unit = {},
 ) {
     Column(
@@ -77,7 +77,7 @@ fun HomeScreen(
             )
 
             Text(
-                text = stringResource(R.string.home_screen_header),
+                text = stringResource(R.string.home_screen_description),
                 style = LeafDiseaseTheme.customTypography.subtitle,
                 textAlign = TextAlign.Center
             )
@@ -128,7 +128,7 @@ fun ModelSelector(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Modelo activo",
+            text = stringResource(R.string.active_model),
             style = LeafDiseaseTheme.typography.labelSmall,
             color = LeafDiseaseTheme.colors.onSurfaceVariant,
             fontWeight = FontWeight.Medium,
@@ -183,7 +183,7 @@ fun HomeImage(
         ) {
             Image(
                 painter = painterResource(R.drawable.plant_image_soy),
-                contentDescription = "Plant Image",
+                contentDescription = stringResource(R.string.plant_image_content_desc),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()

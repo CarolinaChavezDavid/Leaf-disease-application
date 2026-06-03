@@ -34,6 +34,7 @@ class BenchmarkClassifier(
 
     private val timingsNs = mutableListOf<Long>()
     private var warmupNs  = 0L
+    private var lastInferenceMs: Double = 0.0
 
     private var lastTopLabel: String = ""
     private var lastTopConfidence: Float = 0f
@@ -48,15 +49,16 @@ class BenchmarkClassifier(
             warmupNs = elapsed
             Log.d(TAG, "[${modelType.displayName}] warmup=${elapsed / 1_000_000}ms")
         } else {
+            lastInferenceMs = elapsed / 1_000_000.0
             timingsNs.add(elapsed)
             Log.d(TAG, "[${modelType.displayName}] inference[${timingsNs.size}]=${elapsed / 1_000_000}ms")
         }
 
         if (result == null) return null  // error real del modelo
 
-        lastTopLabel = result.diseaseName
+        lastTopLabel = result.rawLabel
         lastTopConfidence = result.confidence
-        Log.d(TAG, "[${modelType.displayName}] top=${result.diseaseName} conf=${"%.2f".format(result.confidence)}")
+        Log.d(TAG, "[${modelType.displayName}] top=${result.rawLabel} conf=${"%.2f".format(result.confidence)}")
 
         return if (result.confidence < CONFIDENCE_THRESHOLD) null else result
     }
@@ -75,17 +77,18 @@ class BenchmarkClassifier(
         val totalPssMb = memInfo.totalPss / 1024.0
 
         return BenchmarkMetrics(
-            modelType      = modelType,
-            initTimeMs     = initTimeMs,
-            warmupMs       = if (warmupNs > 0L) warmupNs / 1_000_000.0 else 0.0,
-            avgMs          = if (ms.isNotEmpty()) ms.average() else 0.0,
-            medianMs       = ms.median(),
-            p95Ms          = ms.percentile(95),
-            stdMs          = ms.std(),
-            totalPssMb     = totalPssMb,
-            sampleCount    = ms.size,
-            topLabel       = lastTopLabel,
-            topConfidence  = lastTopConfidence,
+            modelType       = modelType,
+            initTimeMs      = initTimeMs,
+            warmupMs        = if (warmupNs > 0L) warmupNs / 1_000_000.0 else 0.0,
+            inferenceTimeMs = lastInferenceMs,
+            avgMs           = if (ms.isNotEmpty()) ms.average() else 0.0,
+            medianMs        = ms.median(),
+            p95Ms           = ms.percentile(95),
+            stdMs           = ms.std(),
+            totalPssMb      = totalPssMb,
+            sampleCount     = ms.size,
+            topLabel        = lastTopLabel,
+            topConfidence   = lastTopConfidence,
         )
     }
 
@@ -96,6 +99,7 @@ class BenchmarkClassifier(
     fun resetTimings() {
         timingsNs.clear()
         warmupNs = 0L
+        lastInferenceMs = 0.0
         lastTopLabel = ""
         lastTopConfidence = 0f
         Log.d(TAG, "[${modelType.displayName}] timings reset")

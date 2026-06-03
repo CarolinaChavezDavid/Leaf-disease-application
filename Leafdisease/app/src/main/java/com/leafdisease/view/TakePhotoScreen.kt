@@ -86,7 +86,6 @@ fun TakePhotoScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(LeafDiseaseTheme.colors.background)
-            .statusBarsPadding()
     ) {
         // Header
         ScreenHeader(

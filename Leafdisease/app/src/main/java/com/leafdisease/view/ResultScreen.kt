@@ -152,14 +152,14 @@ fun PlantResultImage(
             if (imageBitmap != null) {
                 Image(
                     bitmap = imageBitmap,
-                    contentDescription = "Plant Image",
+                    contentDescription = stringResource(R.string.plant_image_content_desc),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             } else {
                 Icon(
                     painter = painterResource(R.drawable.ic_center_focus_strong_24),
-                    contentDescription = "Plant Image",
+                    contentDescription = stringResource(R.string.plant_image_content_desc),
                     modifier = Modifier.fillMaxSize(),
                     tint = LeafDiseaseTheme.colors.primary
                 )
@@ -420,7 +420,7 @@ fun BenchmarkMetricsSection(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text       = "Métricas de benchmark",
+                    text       = stringResource(R.string.benchmark_metrics_title),
                     style      = LeafDiseaseTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color      = LeafDiseaseTheme.colors.onSurface,
@@ -444,16 +444,16 @@ fun BenchmarkMetricsSection(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(LeafDiseaseTheme.dimensions.dimension12))
 
-                BenchmarkRow("Top label",        metrics.topLabel.ifEmpty { "—" })
-                BenchmarkRow("Top conf.",       "${"%.1f".format(metrics.topConfidence * 100)} %")
-                BenchmarkRow("Init time",       "${metrics.initTimeMs} ms")
-                BenchmarkRow("Warmup",          "${"%.1f".format(metrics.warmupMs)} ms")
-                BenchmarkRow("Avg (ms)",        "${"%.1f".format(metrics.avgMs)} ms")
-                BenchmarkRow("Mediana (P50)",   "${"%.1f".format(metrics.medianMs)} ms")
-                BenchmarkRow("P95 (ms)",        "${"%.1f".format(metrics.p95Ms)} ms")
-                BenchmarkRow("Std (ms)",        "${"%.1f".format(metrics.stdMs)} ms")
-                BenchmarkRow("Mem. PSS",        "${"%.1f".format(metrics.totalPssMb)} MB")
-                BenchmarkRow("Muestras",        "${metrics.sampleCount}")
+                BenchmarkRow(stringResource(R.string.benchmark_top_label),    metrics.topLabel.ifEmpty { "—" })
+                BenchmarkRow(stringResource(R.string.benchmark_top_conf),     "${"%.1f".format(metrics.topConfidence * 100)} %")
+                BenchmarkRow(stringResource(R.string.benchmark_init_time),    "${metrics.initTimeMs} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_warmup),       "${"%.1f".format(metrics.warmupMs)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_inference),    "${"%.1f".format(metrics.inferenceTimeMs)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_avg_ms),       "${"%.1f".format(metrics.avgMs)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_median_p50),   "${"%.1f".format(metrics.medianMs)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_p95_ms),       "${"%.1f".format(metrics.p95Ms)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_std_ms),       "${"%.1f".format(metrics.stdMs)} ms")
+                BenchmarkRow(stringResource(R.string.benchmark_mem_pss),      "${"%.1f".format(metrics.totalPssMb)} MB")
             }
         }
     }
@@ -476,7 +476,7 @@ private fun BenchmarkRow(label: String, value: String) {
             text       = value,
             style      = LeafDiseaseTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
-            color      = LeafDiseaseTheme.colors.onSurface,
+            color      = LeafDiseaseTheme.colors.onSurfaceVariant,
         )
     }
 }
@@ -519,7 +519,7 @@ fun EncyclopediaLink(
         // Arrow Icon
         Icon(
             painter = painterResource(R.drawable.ic_round_arrow_back_24),
-            contentDescription = "Navigate",
+            contentDescription = stringResource(R.string.navigate_content_desc),
             tint = LeafDiseaseTheme.colors.onSurfaceVariant,
             modifier = Modifier.size(LeafDiseaseTheme.dimensions.dimension20)
         )

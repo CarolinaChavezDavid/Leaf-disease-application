@@ -38,7 +38,7 @@ class ClassifierFactory(private val context: Context) {
 
             val initStart = SystemClock.elapsedRealtimeNanos()
             val delegate: LeafDiseaseClassifier = when (modelType) {
-                ModelType.MOBILENET_V2      -> PlantDiseaseClassifier(context)
+                ModelType.MOBILENET_V3_SMALL      -> PlantDiseaseClassifier(context)
                 ModelType.EFFICIENTNET_V2B0 -> EfficientNetV2Classifier(context)
             }
             val initTimeMs = (SystemClock.elapsedRealtimeNanos() - initStart) / 1_000_000L

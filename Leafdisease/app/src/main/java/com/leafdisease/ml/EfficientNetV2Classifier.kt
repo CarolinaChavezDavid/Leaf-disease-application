@@ -4,31 +4,29 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
-import com.google.ai.edge.litert.Accelerator
-import com.google.ai.edge.litert.CompiledModel
-import com.google.ai.edge.litert.Environment
-import com.google.ai.edge.litert.TensorBuffer
+import org.tensorflow.lite.Interpreter
 import com.leafdisease.domain.model.ClassificationResult
 import com.leafdisease.domain.model.PlantDiseaseInfo
+import java.io.FileInputStream
 import java.io.IOException
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.math.abs
 import kotlin.math.exp
 
 /**
  * Clasificador basado en EfficientNetV2B0 FP16.
  *
- * PREPROCESSING — diferencia crítica respecto a MobileNetV2:
+ * Usa el Interpreter clásico de LiteRT en lugar de CompiledModel porque
+ * EfficientNetV2B0 contiene bloques Fused-MBConv que el compilador AOT de
+ * CompiledModel no soporta. El Interpreter acepta todos los ops TFLite estándar.
+ *
+ * PREPROCESSING — diferencia crítica respecto a MobileNetV3 Small:
  *   EfficientNetV2 fue entrenado con `include_preprocessing=False` y normalización
  *   `pixel / 255.0` en el pipeline Python. La entrada esperada es [0, 1].
  *
- *   MobileNetV2 espera [-1, 1] → formula: `(pixel - 127.5f) / 127.5f`
+ *   MobileNetV3 espera [-1, 1] → formula: `(pixel - 127.5f) / 127.5f`
  *   EfficientNetV2 espera [0, 1] → formula: `pixel / 255.0f`
- *
- *   Usar la normalización equivocada produce probabilidades silenciosamente incorrectas
- *   (el softmax aún suma 1, pero la clase predicha es errónea).
- *
- * El resto de la arquitectura (LiteRT CompiledModel, aceleración GPU/CPU, softmax de salida)
- * es idéntica a [PlantDiseaseClassifier].
  */
 class EfficientNetV2Classifier(
     private val context: Context,
@@ -41,35 +39,24 @@ class EfficientNetV2Classifier(
         private const val INPUT_SIZE = 224
         private const val NUM_CHANNELS = 3
         private const val NUM_CLASSES = 38
-        private const val CONFIDENCE_THRESHOLD = 0.5f
         private const val SOFTMAX_EPSILON = 0.01f
+        private const val NUM_THREADS = 4
 
         // EfficientNetV2 con include_preprocessing=False: entrada normalizada a [0, 1]
         private const val PIXEL_SCALE = 255.0f
     }
 
     private val labels: List<String> = loadLabels()
-    private var environment: Environment? = null
-    private var compiledModel: CompiledModel? = null
-    private var inputBuffers: MutableList<TensorBuffer> = mutableListOf()
-    private var outputBuffers: MutableList<TensorBuffer> = mutableListOf()
+    private var interpreter: Interpreter? = null
 
     init {
         try {
-            environment = Environment.create()
-            environment?.let {
-                val options = createModelOptions(it)
-                compiledModel = CompiledModel.create(
-                    context.assets,
-                    MODEL_PATH,
-                    options,
-                    it
-                )
+            val modelBuffer = loadModelFromAssets()
+            val options = Interpreter.Options().apply {
+                numThreads = NUM_THREADS
             }
-            inputBuffers  = compiledModel?.createInputBuffers()?.toMutableList()  ?: mutableListOf()
-            outputBuffers = compiledModel?.createOutputBuffers()?.toMutableList() ?: mutableListOf()
-
-            Log.d(TAG, "EfficientNetV2B0 initialized — accelerators=${environment?.getAvailableAccelerators()}")
+            interpreter = Interpreter(modelBuffer, options)
+            Log.d(TAG, "EfficientNetV2B0 initialized with Interpreter (${NUM_THREADS} threads)")
         } catch (e: Exception) {
             close()
             Log.e(TAG, "Failed to initialize EfficientNetV2Classifier", e)
@@ -78,8 +65,8 @@ class EfficientNetV2Classifier(
     }
 
     override fun classify(bitmap: Bitmap): ClassificationResult? {
-        val model = compiledModel ?: run {
-            Log.e(TAG, "CompiledModel not initialized")
+        val interp = interpreter ?: run {
+            Log.e(TAG, "Interpreter not initialized")
             return null
         }
 
@@ -87,14 +74,22 @@ class EfficientNetV2Classifier(
             val startTime = SystemClock.uptimeMillis()
             val input = preprocessBitmap(bitmap)
 
-            inputBuffers.firstOrNull()?.writeFloat(input)
-                ?: error("Input tensor buffer not available")
+            // Input: [1, 224, 224, 3] — batch de 1 imagen
+            val inputArray = Array(1) { Array(INPUT_SIZE) { Array(INPUT_SIZE) { FloatArray(NUM_CHANNELS) } } }
+            var offset = 0
+            for (y in 0 until INPUT_SIZE) {
+                for (x in 0 until INPUT_SIZE) {
+                    inputArray[0][y][x][0] = input[offset++]
+                    inputArray[0][y][x][1] = input[offset++]
+                    inputArray[0][y][x][2] = input[offset++]
+                }
+            }
 
-            model.run(inputBuffers, outputBuffers)
+            // Output: [1, 38]
+            val outputArray = Array(1) { FloatArray(NUM_CLASSES) }
+            interp.run(inputArray, outputArray)
 
-            val rawOutput = outputBuffers.firstOrNull()?.readFloat()
-                ?: error("Output tensor buffer not available")
-
+            val rawOutput = outputArray[0]
             val probabilities = rawOutput.toProbabilities()
             val maxIndex = probabilities.indices.maxByOrNull(probabilities::get) ?: return null
             val confidence = probabilities[maxIndex]
@@ -126,6 +121,17 @@ class EfficientNetV2Classifier(
             input[offset++] = ( pixel         and 0xFF) / PIXEL_SCALE  // B → [0, 1]
         }
 
+        // === DIAGNÓSTICO — eliminar después de verificar ===
+        val rawFirst = pixels.take(2).map { p ->
+            Triple((p shr 16) and 0xFF, (p shr 8) and 0xFF, p and 0xFF)
+        }
+        Log.d(TAG, "DIAG raw pixels[0] R=${rawFirst[0].first} G=${rawFirst[0].second} B=${rawFirst[0].third}")
+        Log.d(TAG, "DIAG raw pixels[1] R=${rawFirst[1].first} G=${rawFirst[1].second} B=${rawFirst[1].third}")
+        Log.d(TAG, "DIAG input[0..5]=${input.take(6).map { "%.4f".format(it) }}")
+        Log.d(TAG, "DIAG input stats min=${"%.4f".format(input.min())} max=${"%.4f".format(input.max())} mean=${"%.4f".format(input.average())}")
+        Log.d(TAG, "DIAG bitmap size before resize=${bitmap.width}x${bitmap.height} after=224x224")
+        // === FIN DIAGNÓSTICO ===
+
         if (resizedBitmap !== bitmap && !resizedBitmap.isRecycled) {
             resizedBitmap.recycle()
         }
@@ -133,15 +139,14 @@ class EfficientNetV2Classifier(
         return input
     }
 
-    private fun createModelOptions(environment: Environment): CompiledModel.Options {
-        val available = environment.getAvailableAccelerators()
-        val preferred = buildList {
-            if (available.contains(Accelerator.GPU)) add(Accelerator.GPU)
-            add(Accelerator.CPU)
-        }.toTypedArray()
-
-        Log.d(TAG, "Accelerators available=$available; selected=${preferred.contentToString()}")
-        return CompiledModel.Options(*preferred)
+    private fun loadModelFromAssets(): MappedByteBuffer {
+        return context.assets.openFd(MODEL_PATH).use { fd ->
+            FileInputStream(fd.fileDescriptor).channel.map(
+                FileChannel.MapMode.READ_ONLY,
+                fd.startOffset,
+                fd.declaredLength,
+            )
+        }
     }
 
     private fun loadLabels(): List<String> {
@@ -156,34 +161,26 @@ class EfficientNetV2Classifier(
     }
 
     private fun buildClassificationResult(classIndex: Int, confidence: Float): ClassificationResult {
-        val diseaseInfo = PlantDiseaseInfo.getDiseaseInfo(classIndex)
-        if (diseaseInfo != null) {
-            return ClassificationResult(
-                diseaseName             = diseaseInfo.diseaseName,
-                scientificName          = diseaseInfo.scientificName,
-                confidence              = confidence,
-                isHealthy               = diseaseInfo.isHealthy,
-                description             = diseaseInfo.description,
-                treatmentRecommendations = diseaseInfo.treatmentSteps,
-                plantType               = diseaseInfo.plantType,
-                confidenceLevel         = PlantDiseaseInfo.getConfidenceLevel(confidence)
-            )
-        }
+        val rawLabel = labels.getOrNull(classIndex) ?: ""
 
-        val fallbackLabel = labels.getOrNull(classIndex)
-            ?.replace("___", " - ")
-            ?.replace('_', ' ')
-            ?: "Unknown disease"
+        PlantDiseaseInfo.getClassificationResult(classIndex, confidence, rawLabel, context)
+            ?.let { return it }
+
+        val fallbackLabel = rawLabel
+            .replace("___", " - ")
+            .replace('_', ' ')
+            .ifEmpty { "Unknown disease" }
 
         return ClassificationResult(
-            diseaseName             = fallbackLabel,
-            scientificName          = null,
-            confidence              = confidence,
-            isHealthy               = fallbackLabel.contains("healthy", ignoreCase = true),
-            description             = "Predicción generada por EfficientNetV2B0.",
+            diseaseName              = fallbackLabel,
+            scientificName           = null,
+            confidence               = confidence,
+            isHealthy                = fallbackLabel.contains("healthy", ignoreCase = true),
+            description              = "Predicción generada por EfficientNetV2B0.",
             treatmentRecommendations = emptyList(),
-            plantType               = "Unknown",
-            confidenceLevel         = PlantDiseaseInfo.getConfidenceLevel(confidence)
+            plantType                = "Unknown",
+            confidenceLevel          = PlantDiseaseInfo.getConfidenceLevel(confidence),
+            rawLabel                 = rawLabel,
         )
     }
 
@@ -201,13 +198,7 @@ class EfficientNetV2Classifier(
     }
 
     override fun close() {
-        inputBuffers.forEach(TensorBuffer::close)
-        outputBuffers.forEach(TensorBuffer::close)
-        inputBuffers.clear()
-        outputBuffers.clear()
-        compiledModel?.close()
-        compiledModel = null
-        environment?.close()
-        environment = null
+        interpreter?.close()
+        interpreter = null
     }
 }

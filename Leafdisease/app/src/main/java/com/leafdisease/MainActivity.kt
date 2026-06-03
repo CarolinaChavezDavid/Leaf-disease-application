@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     private var capturedImagePath by mutableStateOf<String?>(null)
     private var classificationResult by mutableStateOf<ClassificationResult?>(null)
     private var benchmarkMetrics by mutableStateOf<BenchmarkMetrics?>(null)
-    private var selectedModel by mutableStateOf(ModelType.MOBILENET_V2)
+    private var selectedModel by mutableStateOf(ModelType.MOBILENET_V3_SMALL)
     private val analysisViewModelFactory: AnalysisViewModel.Factory by lazy {
         (application as LeafDiseaseApplication).appComponent.analysisViewModelFactory()
     }
