@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Asistentes de IA (historial local, no se versiona)
+/.idea/firebender/
+/.claude/
+CLAUDE.md
