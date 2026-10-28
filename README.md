@@ -40,7 +40,7 @@ Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando
 ├─────────────────────────────────────────┤
 │  ML / Data                               │
 │  ClassifierFactory → BenchmarkClassifier │
-│  PlantDiseaseClassifier (MobileNetV2)    │
+│  PlantDiseaseClassifier (MobileNetV3)    │
 │  EfficientNetV2Classifier (V2B0)         │
 └─────────────────────────────────────────┘
 ```
@@ -70,7 +70,7 @@ MainActivity (selectedModel, benchmarkMetrics)
 | Pantalla de análisis | `com/leafdisease/view/AnalyzingScreen.kt` |
 | Pantalla resultados + métricas | `com/leafdisease/view/ResultScreen.kt` |
 | ViewModel del análisis | `com/leafdisease/viewmodel/AnalysisViewModel.kt` |
-| Classifier MobileNetV2 | `com/leafdisease/ml/PlantDiseaseClassifier.kt` |
+| Classifier MobileNetV3 | `com/leafdisease/ml/PlantDiseaseClassifier.kt` |
 | Classifier EfficientNetV2B0 | `com/leafdisease/ml/EfficientNetV2Classifier.kt` |
 | Wrapper de métricas | `com/leafdisease/ml/BenchmarkClassifier.kt` |
 | Fábrica de classifiers | `com/leafdisease/ml/ClassifierFactory.kt` |
