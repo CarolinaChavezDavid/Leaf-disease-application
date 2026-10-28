@@ -1,6 +1,6 @@
 # Leaf-disease-applicaton
 
-## 1. Descripción del proyecto
+## Descripción del proyecto
 
 **Nombre:** Leaf Disease Detection
 Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando modelos de aprendizaje profundo corriendo directamente en el dispositivo (on-device inference), sin dependencia de servidores externos.
@@ -21,7 +21,7 @@ Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando
 
 ---
 
-## 2. Arquitectura actual
+## Arquitectura actual
 
 ### Diagrama de capas
 
