@@ -92,7 +92,7 @@ MainActivity (selectedModel, benchmarkMetrics)
 
 ## Autoría
 
-Aplicación desarrollada por Stefany Carolina Chávez David como parte de la tesis de [Maestría en Ingeniería de Software],
+Aplicación desarrollada por Stefany Carolina Chávez David como parte de la tesis de Maestría en Ingeniería de Software,
 Facultad de Informática, Universidad Nacional de La Plata. La aplicación se utilizó para evaluar la
 ejecución en dispositivo de los modelos MobileNetV3 Small y EfficientNetV2B0 en la clasificación de
 enfermedades foliares.
