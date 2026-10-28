@@ -80,3 +80,20 @@ MainActivity (selectedModel, benchmarkMetrics)
 | Assets (modelos TFLite) | `app/src/main/assets/` |
 
 ---
+
+## Referencias
+
+- [TensorFlow Lite Android Guide](https://www.tensorflow.org/lite/android)
+- [MobileNetV2 Paper](https://arxiv.org/abs/1801.04381)
+- [PlantVillage Dataset](https://github.com/spMohanty/PlantVillage-Dataset)
+- [CameraX Documentation](https://developer.android.com/training/camerax)
+
+---
+
+## Autoría
+
+Aplicación desarrollada por Stefany Carolina Chávez David como parte de la tesis de [Maestría en Ingeniería de Software],
+Facultad de Informática, Universidad Nacional de La Plata. La aplicación se utilizó para evaluar la
+ejecución en dispositivo de los modelos MobileNetV3 Small y EfficientNetV2B0 en la clasificación de
+enfermedades foliares.
+
