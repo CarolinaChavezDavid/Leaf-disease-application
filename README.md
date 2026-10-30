@@ -1,8 +1,9 @@
-# Leaf-disease-applicaton
+# Leaf Scan: detección de enfermedades foliares en Android
 
 ## Descripción del proyecto
 
-**Nombre:** Leaf Disease Detection
+**Nombre:** Leaf Scan (prototipo de investigación, sin relación con aplicaciones comerciales de nombre similar)
+
 Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando modelos de aprendizaje profundo corriendo directamente en el dispositivo (on-device inference), sin dependencia de servidores externos.
 
 **Stack tecnológico:**
@@ -10,14 +11,23 @@ Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando
 |---|---|
 | Lenguaje | Kotlin 100% |
 | UI | Jetpack Compose (sin layouts XML) |
-| Inference engine | Google AI Edge LiteRT (`CompiledModel`) |
+| Motor de inferencia | Google AI Edge LiteRT: `CompiledModel` para MobileNetV3 Small (GPU si está disponible, si no CPU) e `Interpreter` con 4 hilos de CPU para EfficientNetV2B0 |
 | Cámara | CameraX |
 | Inyección de dependencias | Dagger 2 + KSP |
 | Arquitectura | MVVM (Model-View-ViewModel) |
 | Async | Kotlin Coroutines + StateFlow |
 
-**Versión mínima Android:** API 24 (Android 7.0)
-**Target SDK:** 36
+- **Versión mínima Android:** API 24 (Android 7.0)
+- **Target SDK:** 36
+
+**Modelos incluidos** (`app/src/main/assets/`), entrenados sobre PlantVillage (38 clases) y cuantizados en FP16:
+
+| Modelo | Archivo | Tamaño | Motor |
+|---|---|---|---|
+| MobileNetV3 Small | `mobilenetv3_small_v1_fp16.tflite` | 1,91 MB | `CompiledModel` |
+| EfficientNetV2B0 | `efficientnetv2b0_v1_fp16.tflite` | 11,33 MB | `Interpreter` |
+
+EfficientNetV2B0 usa el `Interpreter` porque sus bloques Fused-MBConv no son compatibles con el compilador AOT de `CompiledModel`.
 
 ---
 
@@ -83,8 +93,9 @@ MainActivity (selectedModel, benchmarkMetrics)
 
 ## Referencias
 
-- [TensorFlow Lite Android Guide](https://www.tensorflow.org/lite/android)
-- [MobileNetV2 Paper](https://arxiv.org/abs/1801.04381)
+- [LiteRT para Android](https://ai.google.dev/edge/litert/android)
+- [Searching for MobileNetV3 (Howard et al., 2019)](https://arxiv.org/abs/1905.02244)
+- [EfficientNetV2: Smaller Models and Faster Training (Tan y Le, 2021)](https://arxiv.org/abs/2104.00298)
 - [PlantVillage Dataset](https://github.com/spMohanty/PlantVillage-Dataset)
 - [CameraX Documentation](https://developer.android.com/training/camerax)
 
