@@ -2,7 +2,7 @@
 
 ## Descripción del proyecto
 
-**Nombre:** Leaf Scan (prototipo de investigación, sin relación con aplicaciones comerciales de nombre similar)
+**Nombre:** Leaf Scan (prototipo de investigación)
 
 Aplicación Android nativa que clasifica enfermedades en hojas de plantas usando modelos de aprendizaje profundo corriendo directamente en el dispositivo (on-device inference), sin dependencia de servidores externos.
 
